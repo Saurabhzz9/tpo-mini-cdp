@@ -160,7 +160,7 @@ export async function importCSV(
         });
       }
       await tx.query(
-        `INSERT INTO people(id,email,newsletter,signup_date,status,source,last_open_date,duplicate_count,conflict) SELECT id,email,newsletter,signup_date,status,source,last_open_date,duplicate_count,conflict FROM jsonb_to_recordset($1::jsonb) AS x(id text,email text,newsletter boolean,signup_date timestamptz,status text,source text,last_open_date timestamptz,duplicate_count integer,conflict boolean) WHERE true ON CONFLICT(email) DO UPDATE SET newsletter=true,signup_date=EXCLUDED.signup_date,status=EXCLUDED.status,source=EXCLUDED.source,last_open_date=EXCLUDED.last_open_date,duplicate_count=EXCLUDED.duplicate_count,conflict=EXCLUDED.conflict`,
+        `INSERT INTO people(id,email,newsletter,signup_date,status,source,last_open_date,duplicate_count,conflict) SELECT id,email,newsletter,signup_date,status,source,last_open_date,duplicate_count,conflict FROM jsonb_to_recordset($1::jsonb) AS x(id text,email text,newsletter boolean,signup_date date,status text,source text,last_open_date date,duplicate_count integer,conflict boolean) WHERE true ON CONFLICT(email) DO UPDATE SET newsletter=true,signup_date=EXCLUDED.signup_date,status=EXCLUDED.status,source=EXCLUDED.source,last_open_date=EXCLUDED.last_open_date,duplicate_count=EXCLUDED.duplicate_count,conflict=EXCLUDED.conflict`,
         [JSON.stringify(canonical)],
       );
       const persons = (
