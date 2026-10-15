@@ -31,6 +31,27 @@ describe.skipIf(!process.env.TPO_POSTGRES_TEST_URL)(
       ).toBe(true);
       expect(await query("SELECT id FROM raw_records")).toHaveLength(2);
       expect((await getPeople())[0].duplicate_count).toBe(1);
+      const headers = "visitor_id,page,timestamp,utm_source,email\n";
+      await importCSV(
+        "web_events",
+        headers +
+          "pg_visitor,/about,2026-09-20 10:00:00,Instagram,reader@example.test\npg_visitor,/subscribe,2026-09-20 11:00:00,,\n",
+        "visits.csv",
+      );
+      expect((await getPeople())[0].web_visits).toBe(2);
+      await importCSV(
+        "web_events",
+        headers + "pg_visitor,/about,2026-09-21 10:00:00,,other@example.test\n",
+        "conflicting-visit.csv",
+      );
+      expect((await getPeople())[0].web_visits).toBe(1);
+      expect(
+        (
+          await query<{ ambiguous: boolean }>(
+            "SELECT ambiguous FROM visitors WHERE visitor_id='pg_visitor'",
+          )
+        )[0].ambiguous,
+      ).toBe(true);
     });
     it("serializes concurrent import and webhook identity creation without corrupting links", async () => {
       const results = await Promise.allSettled([

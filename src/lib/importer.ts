@@ -126,6 +126,7 @@ export async function importCSV(
           else groups.set(email, [r]);
         }
       }
+      const canonical = [];
       for (const [email, records] of groups) {
         const sorted = [...records].sort(
           (a, b) =>
@@ -144,22 +145,24 @@ export async function importCSV(
           "last_open_date",
         ].some((k) => new Set(records.map((r) => r[k])).size > 1);
         const personId = `p_${hash(email).slice(0, 24)}`;
-        await tx.query(
-          `INSERT INTO people(id,email,newsletter,signup_date,status,source,last_open_date,duplicate_count,conflict) VALUES($1,$2,true,$3,$4,$5,$6,$7,$8) ON CONFLICT(email) DO UPDATE SET newsletter=true, signup_date=EXCLUDED.signup_date,status=EXCLUDED.status,source=EXCLUDED.source,last_open_date=EXCLUDED.last_open_date,duplicate_count=EXCLUDED.duplicate_count,conflict=EXCLUDED.conflict`,
-          [
-            personId,
-            email,
-            date(first.signup_date),
-            records.some((r) => r.status === "unsubscribed")
-              ? "unsubscribed"
-              : "active",
-            first.acquisition_source || "Unknown",
-            opens.at(-1) || null,
-            records.length - 1,
-            conflict,
-          ],
-        );
+        canonical.push({
+          id: personId,
+          email,
+          newsletter: true,
+          signup_date: date(first.signup_date),
+          status: records.some((r) => r.status === "unsubscribed")
+            ? "unsubscribed"
+            : "active",
+          source: first.acquisition_source || "Unknown",
+          last_open_date: opens.at(-1) || null,
+          duplicate_count: records.length - 1,
+          conflict,
+        });
       }
+      await tx.query(
+        `INSERT INTO people(id,email,newsletter,signup_date,status,source,last_open_date,duplicate_count,conflict) SELECT id,email,newsletter,signup_date,status,source,last_open_date,duplicate_count,conflict FROM jsonb_to_recordset($1::jsonb) AS x(id text,email text,newsletter boolean,signup_date timestamptz,status text,source text,last_open_date timestamptz,duplicate_count integer,conflict boolean) WHERE true ON CONFLICT(email) DO UPDATE SET newsletter=true,signup_date=EXCLUDED.signup_date,status=EXCLUDED.status,source=EXCLUDED.source,last_open_date=EXCLUDED.last_open_date,duplicate_count=EXCLUDED.duplicate_count,conflict=EXCLUDED.conflict`,
+        [JSON.stringify(canonical)],
+      );
       const persons = (
         await tx.query<{ id: string; email: string }>(
           "SELECT id,email FROM people WHERE email IS NOT NULL",
@@ -242,10 +245,6 @@ export async function importCSV(
         }
         if (r.email && !normalizeEmail(r.email))
           row.flags.push("invalid_email");
-        await tx.query(
-          "INSERT INTO visitors(visitor_id) VALUES($1) ON CONFLICT DO NOTHING",
-          [r.visitor_id],
-        );
         row.person_id = byEmail.get(normalizeEmail(r.email) || "") || null;
         events.push({
           id: row.id,
@@ -258,6 +257,15 @@ export async function importCSV(
           original: r,
         });
       }
+      await bulk(
+        tx,
+        "visitors",
+        "visitor_id",
+        "visitor_id text",
+        [...new Set(events.map((event) => event.visitor_id))].map(
+          (visitor_id) => ({ visitor_id }),
+        ),
+      );
       await bulk(
         tx,
         "web_events",
@@ -279,14 +287,20 @@ export async function importCSV(
           claims.get(e.visitor_id)!.add(email);
         }
       }
-      for (const [visitor, emails] of claims) {
+      const mappings = [...claims].map(([visitor_id, emails]) => {
         const list = [...emails],
           pid = list.length === 1 ? byEmail.get(list[0]) || null : null;
-        await tx.query(
-          "UPDATE visitors SET person_id=$1,ambiguous=$2,claims=$3 WHERE visitor_id=$4",
-          [pid, list.length > 1, JSON.stringify(list), visitor],
-        );
-      }
+        return {
+          visitor_id,
+          person_id: pid,
+          ambiguous: list.length > 1,
+          claims: list,
+        };
+      });
+      await tx.query(
+        `UPDATE visitors v SET person_id=x.person_id,ambiguous=x.ambiguous,claims=x.claims FROM jsonb_to_recordset($1::jsonb) AS x(visitor_id text,person_id text,ambiguous boolean,claims jsonb) WHERE v.visitor_id=x.visitor_id`,
+        [JSON.stringify(mappings)],
+      );
       await tx.query(
         `UPDATE web_events w SET person_id=v.person_id FROM visitors v WHERE w.visitor_id=v.visitor_id AND coalesce(w.original->>'email','')=''`,
       );
