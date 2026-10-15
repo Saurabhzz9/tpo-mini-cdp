@@ -16,17 +16,21 @@ param azureAiDeployment string
 param azureAiKey string
 @description('Explicit trusted IPv4 addresses only. Add App Service outbound IPs after deployment.')
 param allowedDatabaseIps array = []
+param expiresOn string = '2026-10-29'
+var demoTags = {project:'tpo-mini-cdp',expiresOn:expiresOn,monthlyBudgetUSD:'30',purpose:'14-day-assessment-demo'}
 
 resource plan 'Microsoft.Web/serverfarms@2023-12-01' = {
   name: '${appName}-plan'
   location: location
   sku: {name:'B1',tier:'Basic',capacity:1}
   kind: 'linux'
+  tags:demoTags
   properties: {reserved:true}
 }
 resource postgres 'Microsoft.DBforPostgreSQL/flexibleServers@2024-08-01' = {
   name: '${appName}-pg'
   location: location
+  tags:demoTags
   sku: {name:'Standard_B1ms',tier:'Burstable'}
   properties: {
     version:'16'
@@ -52,6 +56,7 @@ resource site 'Microsoft.Web/sites@2023-12-01' = {
   name: appName
   location:location
   kind:'app,linux'
+  tags:demoTags
   identity:{type:'SystemAssigned'}
   properties:{
     serverFarmId:plan.id
@@ -74,6 +79,7 @@ resource site 'Microsoft.Web/sites@2023-12-01' = {
         {name:'ADMIN_USERNAME',value:'admin'}
         {name:'ADMIN_PASSWORD_HASH',value:adminPasswordHash}
         {name:'ANALYSIS_DATE',value:'2026-09-28'}
+        {name:'ASSISTANT_DAILY_LIMIT',value:'10'}
         {name:'AZURE_AI_ENDPOINT',value:azureAiEndpoint}
         {name:'AZURE_AI_DEPLOYMENT',value:azureAiDeployment}
         {name:'AZURE_AI_KEY',value:azureAiKey}

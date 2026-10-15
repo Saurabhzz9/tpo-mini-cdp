@@ -21,6 +21,19 @@ jobs:
       - run: npm run test:e2e
       - run: npm run build
       - run: npm audit --omit=dev
+      - name: Package Linux deployment
+        run: |
+          node scripts/check-release.mjs
+          mkdir -p .next/standalone/scripts
+          cp -R migrations .next/standalone/
+          cp scripts/migrate-prod.mjs .next/standalone/scripts/
+          cd .next/standalone
+          zip -q -r ../../tpo-linux.zip .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-deployment
+          path: tpo-linux.zip
+          retention-days: 7
       - uses: actions/upload-artifact@v4
         if: always()
         with:

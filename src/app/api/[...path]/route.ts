@@ -210,6 +210,9 @@ async function handler(
     }
     if (path === "assistant" && req.method === "POST") {
       await rateLimit(`assistant:${s.username}`, 20, 3600);
+      const dailyLimit = Number(process.env.ASSISTANT_DAILY_LIMIT);
+      if (Number.isInteger(dailyLimit) && dailyLimit > 0)
+        await rateLimit("assistant-demo-daily", dailyLimit, 86400);
       const body = z
         .object({ question: z.string().min(3).max(1000) })
         .strict()

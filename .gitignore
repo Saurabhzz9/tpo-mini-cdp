@@ -10,3 +10,5 @@ test-results/
 *.tsbuildinfo
 tmp/
 .local-access.txt
+.cloud-access.txt
+infra/*.local.json
