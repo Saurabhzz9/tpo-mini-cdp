@@ -1,6 +1,6 @@
 import { beforeAll, afterAll, describe, it, expect } from "vitest";
 import { readFile } from "node:fs/promises";
-import { query, closeDb } from "../src/lib/db";
+import { query, closeDb, getDb } from "../src/lib/db";
 import { importCSV } from "../src/lib/importer";
 import { ingestEvent } from "../src/lib/webhook";
 import { getPeople } from "../src/lib/audience";
@@ -21,6 +21,38 @@ describe.skipIf(!process.env.TPO_POSTGRES_TEST_URL)(
     afterAll(async () => {
       await closeDb();
       delete process.env.DATABASE_URL;
+    });
+    it("bounds abandoned transactions and releases their advisory locks without crashing the pool", async () => {
+      const settings = await query<{ name: string; setting: number }>(
+        "SELECT name,setting::int setting FROM pg_settings WHERE name IN ('statement_timeout','lock_timeout','idle_in_transaction_session_timeout')",
+      );
+      expect(
+        Object.fromEntries(settings.map((s) => [s.name, s.setting])),
+      ).toEqual({
+        statement_timeout: 120000,
+        lock_timeout: 15000,
+        idle_in_transaction_session_timeout: 60000,
+      });
+      const db = await getDb();
+      await expect(
+        db.transaction(async (tx) => {
+          await tx.query("SELECT pg_advisory_xact_lock(481512)");
+          await tx.query(
+            "SET LOCAL idle_in_transaction_session_timeout='100ms'",
+          );
+          await new Promise((resolve) => setTimeout(resolve, 250));
+          await tx.query("SELECT 1");
+        }),
+      ).rejects.toThrow();
+      await db.transaction(async (tx) => {
+        const result = await tx.query<{ available: boolean }>(
+          "SELECT pg_try_advisory_xact_lock(481512) available",
+        );
+        expect(result.rows[0].available).toBe(true);
+      });
+      expect(
+        (await query<{ healthy: number }>("SELECT 1 healthy"))[0].healthy,
+      ).toBe(1);
     });
     it("preserves raw duplicates and supports repeat-safe imports", async () => {
       const csv =

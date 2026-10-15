@@ -20,13 +20,21 @@ export async function getDb(): Promise<DB> {
         const pool = new Pool({
           connectionString: process.env.DATABASE_URL,
           max: 8,
+          connectionTimeoutMillis: 15000,
+          statement_timeout: 120000,
+          lock_timeout: 15000,
+          idle_in_transaction_session_timeout: 60000,
         });
+        const connectionClosed = () =>
+          console.error("Database connection closed");
+        pool.on("error", connectionClosed);
         return {
           query: async <T>(s: string, p?: unknown[]) => ({
             rows: (await pool.query(s, p)).rows as T[],
           }),
           transaction: async <T>(fn: (tx: SQL) => Promise<T>) => {
             const c = await pool.connect();
+            c.on("error", connectionClosed);
             try {
               await c.query("BEGIN");
               const v = await fn({
@@ -37,9 +45,10 @@ export async function getDb(): Promise<DB> {
               await c.query("COMMIT");
               return v;
             } catch (e) {
-              await c.query("ROLLBACK");
+              await c.query("ROLLBACK").catch(() => {});
               throw e;
             } finally {
+              c.removeListener("error", connectionClosed);
               c.release();
             }
           },
