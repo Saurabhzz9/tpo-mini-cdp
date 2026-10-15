@@ -120,7 +120,11 @@ export async function importCSV(
       const groups = new Map<string, Record<string, string>[]>();
       for (const r of [...old, ...rows]) {
         const email = normalizeEmail(r.email);
-        if (email) groups.set(email, [...(groups.get(email) || []), r]);
+        if (email) {
+          const group = groups.get(email);
+          if (group) group.push(r);
+          else groups.set(email, [r]);
+        }
       }
       for (const [email, records] of groups) {
         const sorted = [...records].sort(

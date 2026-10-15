@@ -29,7 +29,7 @@ resource cleanup 'Microsoft.Logic/workflows@2019-05-01' = {
           type:'Query'
           inputs:{
             from:'@body(\'List_resources\')?[\'value\']'
-            where:'@not(contains(createArray(\'${appName}\',\'${appName}-plan\',\'${appName}-pg\',\'${appName}-expiry\'),item()?[\'name\']))'
+            where:'@not(contains(createArray(\'${appName}\',\'${appName}-plan\',\'${appName}-pg\',\'${appName}-expiry\',\'${appName}-ci\'),item()?[\'name\']))'
           }
           runAfter:{List_resources:['Succeeded']}
         }

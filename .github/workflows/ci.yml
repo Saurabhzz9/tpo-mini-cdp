@@ -1,4 +1,6 @@
 name: Verify application
+permissions:
+  contents: read
 on:
   push:
     branches: [main]
@@ -58,3 +60,38 @@ jobs:
             playwright-report/
             test-results/
           retention-days: 7
+  deploy-demo:
+    needs: verify
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: azure-assessment-demo
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
+    steps:
+      - name: Respect the 14-day assessment expiry
+        id: lifetime
+        run: |
+          if [[ "$(date -u +%Y%m%d)" < "20261029" ]]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/download-artifact@v4
+        if: steps.lifetime.outputs.enabled == 'true'
+        with:
+          name: linux-deployment
+      - uses: azure/login@v2
+        if: steps.lifetime.outputs.enabled == 'true'
+        with:
+          client-id: 1913b7ea-ee45-4d08-a341-166c06efea3b
+          tenant-id: c7b539b9-5e41-46ed-922b-b097a5bc6515
+          subscription-id: e96c8788-8622-4dae-a0b4-ec85fe87fde6
+      - name: Deploy the verified Linux standalone release
+        if: steps.lifetime.outputs.enabled == 'true'
+        run: |
+          az webapp config appsettings set --resource-group tpo-mini-cdp-demo-rg --name tpo-cdp-s9-261015 --settings SCM_DO_BUILD_DURING_DEPLOYMENT=false ENABLE_ORYX_BUILD=false --output none
+          az webapp config set --resource-group tpo-mini-cdp-demo-rg --name tpo-cdp-s9-261015 --startup-file "node server.js" --output none
+          az webapp deploy --resource-group tpo-mini-cdp-demo-rg --name tpo-cdp-s9-261015 --src-path tpo-linux.zip --type zip --clean true --restart true --timeout 600000 --output none

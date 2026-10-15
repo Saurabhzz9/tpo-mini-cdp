@@ -6,6 +6,8 @@ const secrets = [
   "WEBHOOK_SECRET",
   "AZURE_AI_KEY",
   "ADMIN_PASSWORD_HASH",
+  "ANALYST_PASSWORD_HASH",
+  "DATABASE_URL",
 ]
   .map((k) => process.env[k])
   .filter((v) => v && v.length >= 16);

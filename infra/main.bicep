@@ -4,9 +4,9 @@ param location string = resourceGroup().location
 param databaseAdmin string = 'tpoadmin'
 @secure()
 param databasePassword string
-param applicationDatabaseUser string = databaseAdmin
+param applicationDatabaseUser string = 'tpoapp'
 @secure()
-param applicationDatabasePassword string = ''
+param applicationDatabasePassword string
 @secure()
 param sessionSecret string
 @secure()
@@ -78,7 +78,7 @@ resource site 'Microsoft.Web/sites@2023-12-01' = {
         {name:'PORT',value:'8080'}
         {name:'HOSTNAME',value:'0.0.0.0'}
         {name:'APP_URL',value:'https://${appName}.azurewebsites.net'}
-        {name:'DATABASE_URL',value:'postgresql://${applicationDatabaseUser}:${uriComponent(empty(applicationDatabasePassword) ? databasePassword : applicationDatabasePassword)}@${postgres.properties.fullyQualifiedDomainName}:5432/tpo?sslmode=verify-full'}
+        {name:'DATABASE_URL',value:'postgresql://${applicationDatabaseUser}:${uriComponent(applicationDatabasePassword)}@${postgres.properties.fullyQualifiedDomainName}:5432/tpo?sslmode=verify-full'}
         {name:'SESSION_SECRET',value:sessionSecret}
         {name:'WEBHOOK_SECRET',value:webhookSecret}
         {name:'ADMIN_USERNAME',value:'admin'}
