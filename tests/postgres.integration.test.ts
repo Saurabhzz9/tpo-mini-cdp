@@ -80,6 +80,20 @@ describe.skipIf(!process.env.TPO_POSTGRES_TEST_URL)(
           "SELECT event_id FROM app_events WHERE event_id='pg_first'",
         ),
       ).toHaveLength(1);
+      const profiles = (await getPeople()).length;
+      await importCSV(
+        "app_users",
+        "user_id,email,created_at\npg_concurrent,rejected-network-claim@example.test,2026-09-01\n",
+        "rejected-account.csv",
+      );
+      expect((await getPeople()).length).toBe(profiles);
+      expect(
+        (
+          await query<{ flags: string[] }>(
+            "SELECT flags FROM raw_records WHERE original->>'email'='rejected-network-claim@example.test'",
+          )
+        )[0].flags,
+      ).toContain("conflicting_app_identity");
     });
     it("handles concurrent retries, late anonymous events, dynamic segments and conflicting claims", async () => {
       const event = {

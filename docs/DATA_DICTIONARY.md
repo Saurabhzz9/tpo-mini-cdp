@@ -23,6 +23,8 @@ Recomputed from source: 2,900 valid unique newsletter identities; 85 duplicate p
 - `audit_log`: import, webhook and export actions without full event bodies or emails.
 - `rate_limits`: durable shared endpoint counters and reset time.
 
+Authorized segment CSV exports contain email, status, source, signup date, score, web visits, app events and semicolon-separated `app_user_ids`. The final column keeps standalone accounts actionable when no email is known; it is never included in model context. Every exported cell receives spreadsheet-formula protection and CSV quoting.
+
 ## Metric definitions
 
 Unique subscriber means a canonical valid newsletter identity, independent of its status. Active subscription means status `active`, not necessarily recent engagement. The supplied canonical status totals are 2,610 active and 290 unsubscribed. Inactivity on the overview combines 30+ days since last newsletter open and never-opened readers; the individual groups are shown separately. `days_inactive` segment conditions exclude null last-open dates, so add a `never_opened` OR rule when appropriate. Segments default to unique newsletter people. The all-profiles scope also includes standalone app identities; it never counts source rows or unresolved anonymous visitors.

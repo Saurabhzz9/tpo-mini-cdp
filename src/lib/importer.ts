@@ -203,27 +203,30 @@ export async function importCSV(
             [email],
           )
         ).rows[0];
-        if (!person) {
-          const pid = `p_${hash(email || r.user_id).slice(0, 24)}`;
-          await tx.query(
-            "INSERT INTO people(id,email) VALUES($1,$2) ON CONFLICT DO NOTHING",
-            [pid, email],
-          );
-          person = { id: pid, newsletter: false };
-        }
-        row.person_id = person.id;
-        if (!person.newsletter) row.flags.push("unmatched_app");
-        if (!email) row.flags.push("invalid_email");
+        const candidateId =
+          person?.id || `p_${hash(email || r.user_id).slice(0, 24)}`;
         const existingUser = (
           await tx.query<{ person_id: string }>(
             "SELECT person_id FROM app_users WHERE user_id=$1",
             [r.user_id],
           )
         ).rows[0];
-        if (existingUser && existingUser.person_id !== person.id) {
+        if (existingUser && existingUser.person_id !== candidateId) {
+          row.person_id = existingUser.person_id;
           row.flags.push("conflicting_app_identity");
+          if (!email) row.flags.push("invalid_email");
           continue;
         }
+        if (!person) {
+          await tx.query(
+            "INSERT INTO people(id,email) VALUES($1,$2) ON CONFLICT DO NOTHING",
+            [candidateId, email],
+          );
+          person = { id: candidateId, newsletter: false };
+        }
+        row.person_id = person.id;
+        if (!person.newsletter) row.flags.push("unmatched_app");
+        if (!email) row.flags.push("invalid_email");
         await tx.query(
           "INSERT INTO app_users(user_id,person_id,email,created_at,original) VALUES($1,$2,$3,$4,$5) ON CONFLICT DO NOTHING",
           [r.user_id, person.id, email, date(r.created_at), JSON.stringify(r)],

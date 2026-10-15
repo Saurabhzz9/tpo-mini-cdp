@@ -610,6 +610,40 @@ describe("PII boundary and aggregate-only Azure transport", () => {
   });
 });
 describe("conflicting and ambiguous imported identities", () => {
+  it("preserves conflicting app claims without creating phantom audience profiles", async () => {
+    const existing = (
+      await query<{ user_id: string; person_id: string }>(
+        "SELECT user_id,person_id FROM app_users WHERE email IS NOT NULL LIMIT 1",
+      )
+    )[0];
+    const before = (await getPeople()).length;
+    await importCSV(
+      "app_users",
+      `user_id,email,created_at\n${existing.user_id},rejected-claim@example.test,2026-09-01\n`,
+      "rejected-app-claim.csv",
+    );
+    expect((await getPeople()).length).toBe(before);
+    expect(
+      (
+        await query<{ person_id: string }>(
+          "SELECT person_id FROM app_users WHERE user_id=$1",
+          [existing.user_id],
+        )
+      )[0].person_id,
+    ).toBe(existing.person_id);
+    const raw = (
+      await query<{
+        person_id: string;
+        flags: string[];
+        original: { email: string };
+      }>(
+        "SELECT person_id,flags,original FROM raw_records WHERE original->>'email'='rejected-claim@example.test'",
+      )
+    )[0];
+    expect(raw.person_id).toBe(existing.person_id);
+    expect(raw.flags).toContain("conflicting_app_identity");
+    expect(raw.original.email).toBe("rejected-claim@example.test");
+  });
   it("keeps both conflicting subscriber rows and applies deterministic merge rules", async () => {
     const csv =
       "email,signup_date,status,acquisition_source,last_open_date\nconflict@example.com,2026-07-01,active,Instagram,2026-09-01\n CONFLICT@example.com ,2026-07-10,unsubscribed,Facebook,2026-09-20\n";

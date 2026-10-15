@@ -22,7 +22,7 @@ Every CSV row, including blank and invalid rows, is stored as original JSON with
 
 Email normalization is exclusively `normalizeEmail` in `src/lib/identity.ts`: trim, lowercase, validate with Zod. No Gmail-specific rewriting. Valid normalized email is unique in `people`; deterministic hash-derived internal IDs are not sent to AI. Duplicates keep all raw records. Earliest signup wins; latest observed newsletter open wins; any unsubscribed row wins for status; earliest signup record supplies acquisition source, with a deterministic JSON tie-break. Divergent metadata sets the conflict flag. These are conservative snapshot merge rules, not subscription consent history.
 
-App accounts link through normalized valid email; unmatched accounts retain standalone profiles. Direct email-bearing web events link to matching newsletter identities. Anonymous events inherit the visitor mapping only when all valid email claims for that visitor agree. Conflicting claims revoke anonymous backfill; direct explicit claims stay attached. Invalid/unknown emails never become trusted visitor claims for another subscriber.
+App accounts link through normalized valid email; unmatched accounts retain standalone profiles. An existing app ID with a different claimed person is flagged before creating another profile; the original claim remains preserved and the established owner stays unchanged. Direct email-bearing web events link to matching newsletter identities. Anonymous events inherit the visitor mapping only when all valid email claims for that visitor agree. Conflicting claims revoke anonymous backfill; direct explicit claims stay attached. Invalid/unknown emails never become trusted visitor claims for another subscriber.
 
 ## Live app events
 
