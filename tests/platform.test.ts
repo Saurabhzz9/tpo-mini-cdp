@@ -35,6 +35,9 @@ describe("normalization and time", () => {
   it("parses actual SQL CSV timestamps as UTC and flags invalid dates", () => {
     expect(sourceDate("2026-06-30 20:11:42")).toBe("2026-06-30T20:11:42Z");
     expect(sourceDate("2026-02-31")).toBeNull();
+    expect(sourceDate("2026-09-28T01:00:00+05:30")).toBe(
+      "2026-09-28T01:00:00+05:30",
+    );
     expect(sourceDate("broken")).toBeNull();
   });
   it("pins historical recency and accepts future ingestion independently", () => {
@@ -109,6 +112,30 @@ describe("the complete supplied synthetic dataset", () => {
     ).toHaveLength(0);
   });
   it("evaluates AND/OR segments and never-opened explicitly", async () => {
+    const never = (await getPeople()).find(
+      (p) => p.newsletter && p.never_opened,
+    )!;
+    expect(
+      matches(never, {
+        match: "all",
+        rules: [{ field: "days_inactive", operator: "gte", value: 30 }],
+      }),
+    ).toBe(false);
+    expect(
+      matches(never, {
+        match: "all",
+        rules: [{ field: "never_opened", operator: "eq", value: true }],
+      }),
+    ).toBe(true);
+    expect(
+      matches(never, {
+        match: "any",
+        rules: [
+          { field: "days_inactive", operator: "gte", value: 30 },
+          { field: "never_opened", operator: "eq", value: true },
+        ],
+      }),
+    ).toBe(true);
     const p = (await getPeople()).find(
       (p) => p.source === "Instagram" && p.newsletter,
     )!;
