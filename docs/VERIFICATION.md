@@ -1,5 +1,7 @@
 # Verification evidence
 
+The current presentation release, `f0d657a53826543a2bac22968aa369714667c83c`, passed [Linux CI and Azure deployment](https://github.com/Saurabhzz9/tpo-mini-cdp/actions/runs/38765421523): 36 unit/integration tests, eleven browser scenarios, typecheck, lint, optimized build, dependency audit and release scanning/packaging. Post-deployment checks verified the requested administrator login, source-backed overview, loaded self-hosted Poppins, coral `#f2817d`, ownership notice, desktop layout and working mobile navigation without horizontal overflow. The three hosted screenshots below were refreshed from that release; this presentation check made no model requests.
+
 The application baseline at `b467b76e4570fef61c12f4d307b39b523997ccc8` passed [Linux CI and Azure delivery](https://github.com/Saurabhzz9/tpo-mini-cdp/actions/runs/38758805189) on October 15, 2026. This page consolidates the recorded results; it does not present historical checks as newly executed checks.
 
 | Executed check | Recorded result |
