@@ -114,7 +114,7 @@ export default function InsightsScreen() {
             <div className={css(styles, "chart cohort-chart")}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={d.cohorts}>
-                  <CartesianGrid vertical={false} stroke="#eeeae5" />
+                  <CartesianGrid vertical={false} stroke="#efebe9" />
                   <XAxis
                     dataKey="month"
                     axisLine={false}
@@ -131,14 +131,14 @@ export default function InsightsScreen() {
                     isAnimationActive={false}
                     dataKey="count"
                     name="Subscribers"
-                    fill="#d9cec2"
+                    fill="#f5c1bb"
                     radius={[4, 4, 0, 0]}
                   />
                   <Bar
                     isAnimationActive={false}
                     dataKey="engaged"
                     name="Opened in 30 days"
-                    fill="#7d8d74"
+                    fill="#d86763"
                     radius={[4, 4, 0, 0]}
                   />
                 </BarChart>

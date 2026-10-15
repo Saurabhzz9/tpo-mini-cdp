@@ -12,3 +12,16 @@ tmp/
 .local-access.txt
 .cloud-access.txt
 infra/*.local.json
+
+# Personal recording preparation and media are not assessment source.
+/loom/
+/.loom/
+/docs/LOOM_PLAN.md
+/scripts/loom-*
+
+# Regenerated local release evidence; hosted submission screenshots are tracked.
+/docs/overview.png
+/docs/overview-mobile.png
+/docs/assistant.png
+/docs/ai-smoke.json
+/docs/ai-segment-smoke.json

@@ -112,8 +112,12 @@ export default function Login() {
             <ShieldCheck size={17} /> Private workspace · Access by invitation
           </div>
           <p className={css(styles, "login-help")}>
-            Local setup? Your generated credentials are in{" "}
-            <code>.local-access.txt</code>.
+            Need access? Contact your workspace administrator.
+          </p>
+          <p className={css(styles, "assessment-notice")}>
+            © 2026 Saurabh Rai · Saurabhzz9
+            <br />
+            Assessment use only. Reuse requires written permission.
           </p>
         </div>
       </section>

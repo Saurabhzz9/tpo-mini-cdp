@@ -8,35 +8,40 @@
   flex-direction: column;
   justify-content: space-between;
   padding: 60px 70px;
-  background: #e9ecdf;
-  border-right: 1px solid #dfe4d2;
+  background: #fff2ef;
+  border-right: 1px solid #f4d6d2;
 }
 .wordmark {
   display: flex;
   gap: 13px;
   align-items: center;
-  color: #5c6a4b;
-  font-family: var(--serif);
+  color: #3f322b;
+  font-family: var(--font-sans);
   font-size: 31px;
   font-weight: bold;
   letter-spacing: -1px;
 }
 .wordmark-dot {
-  color: var(--metadata);
+  color: var(--accent);
+}
+.wordmark > svg {
+  color: var(--accent);
 }
 .login-story > div:nth-child(2) {
   padding: 70px 0;
 }
 .login-story h1 {
-  font-family: var(--serif);
+  font-family: var(--font-sans);
   font-size: 48px;
   line-height: 1.25;
   letter-spacing: -1.5px;
-  color: #687958;
+  color: #171717;
+  font-weight: 300;
 }
 .login-story h1 em {
-  color: var(--metadata);
-  font-weight: 400;
+  color: var(--accent-strong);
+  font-weight: 300;
+  font-style: normal;
 }
 .login-story p {
   font-size: 13px;
@@ -64,16 +69,17 @@
   display: grid;
   place-items: center;
   padding: 50px;
-  background: #fdfdf8;
+  background: #fff;
 }
 .login-form-inner {
   width: 100%;
   max-width: 355px;
 }
 .login-form h2 {
-  font-family: var(--serif);
+  font-family: var(--font-sans);
   font-size: 34px;
-  color: var(--metadata);
+  color: var(--heading);
+  font-weight: 400;
   letter-spacing: -0.7px;
 }
 .login-form :global(.muted) {
@@ -116,6 +122,15 @@
 }
 .login-help code {
   font-size: 9px;
+}
+.assessment-notice {
+  margin-top: 30px;
+  border-top: 1px solid var(--border);
+  padding-top: 18px;
+  color: var(--metadata);
+  font-size: 10px;
+  line-height: 1.9;
+  text-align: center;
 }
 .login-form :global(.notice) {
   margin: 0;

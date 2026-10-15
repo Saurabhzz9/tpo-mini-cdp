@@ -1,7 +1,7 @@
 .overview-banner {
-  border: 1px solid #e4e4d7;
+  border: 1px solid #f4d6d2;
   border-radius: 7px;
-  background: #eeefe4;
+  background: #fff2ef;
   display: flex;
   align-items: center;
   gap: 15px;
@@ -11,17 +11,17 @@
 .banner-icon {
   display: grid;
   place-items: center;
-  background: #e4e7d7;
-  border: 1px solid #d8dfc9;
+  background: #fbdedb;
+  border: 1px solid #f4d6d2;
   border-radius: 7px;
   color: var(--metadata);
   width: 42px;
   height: 42px;
 }
 .overview-banner strong {
-  font-family: var(--serif);
+  font-family: var(--font-sans);
   font-size: 17px;
-  color: #616b51;
+  color: #94413e;
 }
 .overview-banner p {
   font-size: 10px;
@@ -58,7 +58,7 @@
 .source-row b {
   font-weight: 500;
   margin-left: auto;
-  color: #69735a;
+  color: #746b67;
 }
 .source-row small {
   width: 30px;
@@ -70,7 +70,7 @@
 .source-bar-track {
   height: 4px;
   border-radius: 4px;
-  background: #f2f2eb;
+  background: #f5f3f2;
   margin-left: 13px;
 }
 .source-bar-track i {
@@ -115,17 +115,17 @@
   flex-shrink: 0;
 }
 .health-stats strong {
-  font-family: var(--serif);
+  font-family: var(--font-sans);
   font-size: 23px;
   font-weight: 400;
   line-height: 1;
-  color: #657055;
+  color: #94413e;
 }
 .quality-symbol {
   display: grid;
   place-items: center;
   color: var(--metadata);
-  background: #eff2e8;
+  background: #fff0ee;
   width: 35px;
   height: 35px;
   border-radius: 50%;
@@ -137,7 +137,7 @@
   justify-content: space-between;
 }
 .quality-mini strong {
-  font-family: var(--serif);
+  font-family: var(--font-sans);
   font-size: 25px;
   font-weight: 400;
   color: var(--metadata);
@@ -152,9 +152,9 @@
   display: flex;
   align-items: center;
   gap: 13px;
-  border: 1px solid #e8e6da;
+  border: 1px solid #e9e5e3;
   border-radius: 7px;
-  background: #f4f1e9;
+  background: #faf7f5;
   padding: 16px 21px;
   color: var(--metadata);
 }
@@ -165,7 +165,7 @@
   flex: 1;
 }
 .insight-nudge strong {
-  font-family: var(--serif);
+  font-family: var(--font-sans);
   font-size: 14px;
   font-weight: 400;
   color: var(--metadata);
@@ -175,7 +175,7 @@
   color: var(--metadata);
 }
 .insight-nudge :global(.button) {
-  background: #fbfaf5;
+  background: #fcfbfa;
   border-color: var(--metadata);
   color: var(--metadata);
 }

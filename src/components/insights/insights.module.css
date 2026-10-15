@@ -31,7 +31,7 @@
   left: 0;
   bottom: 0;
   height: 2px;
-  background: #e5ecda;
+  background: #f5d9d5;
   max-width: 100%;
 }
 .journey-card {
@@ -51,8 +51,8 @@
 .journey-stage > span {
   display: grid;
   place-items: center;
-  border: 1px solid #e9efdc;
-  background: #f4f8ed;
+  border: 1px solid #e9e5e3;
+  background: #faf7f5;
   width: 26px;
   height: 26px;
   border-radius: 50%;
@@ -70,13 +70,13 @@
 .journey-stage i {
   display: block;
   height: 4px;
-  background: #d4dfc3;
+  background: #f4d6d2;
   margin-top: 8px;
   border-radius: 4px;
 }
 .journey-stage b {
   font-size: 17px;
-  font-family: var(--serif);
+  font-family: var(--font-sans);
   font-weight: 400;
   color: var(--metadata);
 }

@@ -192,6 +192,10 @@ export default function WorkspaceLayout({
               Live events update separately
             </span>
           </footer>
+          <div className="assessment-notice">
+            © 2026 Saurabh Rai · Saurabhzz9. Assessment use only. Reuse requires
+            written permission.
+          </div>
         </div>
       </div>
     </SettingsContext.Provider>

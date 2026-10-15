@@ -8,6 +8,14 @@ All three input CSVs are synthetic according to the three-page assessment PDF. T
 | app_users.csv | user_id, email, created_at | 930 |
 | web_events.csv | visitor_id, page, timestamp, utm_source, email | 10,000 |
 
+Source SHA-256 checksums, reproducible with `Get-FileHash data/*.csv -Algorithm SHA256` or `sha256sum data/*.csv`:
+
+| File | SHA-256 |
+|---|---|
+| subscribers.csv | `ca4a1dc36ab10203d1e8f9f484a3d0e05f8ed1caacd31d73037b4af0bd0b21b6` |
+| app_users.csv | `b44b3be3df8b66c125e32c522b82ac6497a4a721f4473312fea58d280dcaf556` |
+| web_events.csv | `9a64859020cc2999e0c21beab19676d97047d740e42db4ba0c13055843b80050` |
+
 Recomputed from source: 2,900 valid unique newsletter identities; 85 duplicate pairs (170 original rows); 8 fully blank rows; 2 invalid emails; 900 matched and 30 unmatched app accounts; 1,400 email-bearing web events; 2,028 visitor IDs; 8,441 website events resolved through direct email or visitor association. The supplied file has no conflicting visitor identities and no conflicting duplicate metadata. The tests exercise those cases separately.
 
 ## Store

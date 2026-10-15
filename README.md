@@ -1,16 +1,14 @@
 # The Pour Over · Reader Intelligence
 
-A working mini customer data platform for the Growth team: preserved CSV source records, unified reader profiles, live app events, dynamic segments, acquisition insights and a privacy-constrained Azure AI assistant.
+A mini customer data platform for Growth: preserved source records, canonical reader profiles, identity relationships, dynamic audiences, signed app events, acquisition insights and an aggregate-only Azure AI assistant.
 
-Assessment demo: Azure hosting is limited to **14 days, ending October 29, 2026**. The approved target is approximately **US$30/month**; the selected fixed hosting estimate is US$28.50/month before light inference, network usage and taxes. The dedicated demo resources are scheduled for removal on October 29 at 12:00 IST. See [deployment and cleanup](docs/DEPLOYMENT.md) for live acceptance status, exact inventory and cost limits.
+**[Live assessment demo](https://tpo-cdp-s9-261015.azurewebsites.net)** · Hosting ends **October 29, 2026 at 12:00 IST**. Administrator credentials are handed over separately in ignored local access files. The fixed hosting estimate is US$28.50/month, within the approximately US$30/month target before inference, network usage and taxes; dedicated demo resources are scheduled for removal after fourteen days. See [deployment and cleanup](docs/DEPLOYMENT.md).
 
-**Live demo: [Reader Intelligence](https://tpo-cdp-s9-261015.azurewebsites.net).** The generated staff login is in the local ignored `.cloud-access.txt` file. The hosted URL will become unavailable when the demo resources are removed.
-
-![The actual hosted Reader Intelligence dashboard](docs/cloud-overview.png)
+![Reader Intelligence dashboard](docs/cloud-overview.png)
 
 ## Run locally
 
-Node.js 24 and npm are required. No Docker or database installation is necessary for the local PostgreSQL engine.
+Requires Node.js 24 and npm. Local PGlite runs PostgreSQL without a separate database installation.
 
 ```sh
 npm ci
@@ -19,83 +17,59 @@ npm run import
 npm run dev
 ```
 
-Open [localhost:3000](http://localhost:3000). The setup command creates ignored `.env` and `.local-access.txt` files. Read the latter for your generated administrator login. No shared default password is committed.
+Open [localhost:3000](http://localhost:3000). Setup creates ignored `.env` and `.local-access.txt` files with a generated administrator login; no shared password is committed. The synthetic CSVs are in `data/`. Identical imports are checksum no-ops; original rows are preserved. For other files use `npm run import -- /path/to/csv-directory`, in subscriber → app-user → web-event order. Stop the local app before CLI imports because PGlite requires one owning process; the authenticated Settings importer works within the running app.
 
-The three synthetic assessment CSVs are included in `data/`. Importing the same file twice is a no-op, and source rows are never discarded. For different files: `npm run import -- /path/to/csv-directory`. Import from CLI while the local app is stopped; PGlite supports one owning process. The authenticated Settings importer works while the app is running. Import subscribers before app users and web events.
+## Capabilities
 
-## What works
+- Source-backed overview: 2,900 canonical newsletter people, 10,000 website events, 8,441 resolved visits and 900 linked app accounts.
+- Search and Subscriber 360 with identity relationships, newsletter snapshots, channel chronology and raw duplicate lineage.
+- Data Quality Center for blank/invalid rows, duplicates, unmatched accounts and unresolved visitors.
+- AND/OR segments, newsletter/all-profile scope, current previews, saved audiences and formula-safe authorized CSV export.
+- Durable signed webhooks, conflicting retry rejection, unknown accounts and conservative event-time identity linking; isolated Event Lab demonstrations.
+- Acquisition/cohort insights and transparent engagement scores. AI answers use allowlisted aggregates and validated segment proposals, with inspectable model input.
 
-- Overview from real data: 2,900 canonical newsletter identities, 10,000 website visits, 8,441 resolved visits and 900 linked app accounts. These are source verification results, not constants used by the dashboard.
-- Search by email, profile ID, app user ID, visitor ID or source. Subscriber 360 includes newsletter snapshots, website/app chronology, identity links and original source rows.
-- Raw duplicate preservation, invalid/blank record flags, unmatched app accounts and anonymous visitor coverage.
-- AND/OR segments with newsletter/all-profile scope, previews, save/edit/delete, current membership and formula-safe authorized CSV export.
-- HMAC-protected `POST /webhooks/app`: persisted idempotency, conflicting duplicate rejection, event-time ordering, unknown users and safe anonymous device backfill.
-- Isolated Event Lab for actual signed deliveries, duplicate retries and out-of-order demonstrations.
-- Acquisition comparisons, signup cohorts, transparent engagement scoring and observed channel relationships.
+The visual system follows [The Pour Over's](https://thepourover.org/) Poppins typography, coral accents, white/gray surfaces and dark text. Fonts are self-hosted under the bundled Open Font License. This is an assessment application, not an official production service.
 
-- Azure AI aggregate answers and structured segment proposals. User text is projected to an approved intent before inference; source PII and raw messages never enter model requests. Missing configuration returns an explicit unavailable state.
+## Configuration
 
-The workspace is organized into feature components and scoped CSS Modules, with an authenticated server layout and a persistent navigation shell. [Architecture findings and verification](docs/REFACTOR_REVIEW.md) describe the changes and limits. [Development responsibilities](docs/DEVELOPMENT_PROCESS.md) distinguish human engineering direction and active review from AI-generated implementation and recorded automated execution. Point 9 of the [current raw self-audit](docs/SELF_AUDIT.md) directly documents the developer's architecture, database, product, security/privacy, infrastructure, review, testing and acceptance responsibilities.
-
-## Architecture and environment
-
-One full-stack Next.js 16 application, React 19, strict TypeScript, Zod, parameterized SQL, PostgreSQL/PGlite, iron-session, Recharts, Lucide and a custom responsive CSS system. Business logic is in `src/lib`; authenticated APIs and the exact webhook path are Next.js route handlers.
+One full-stack Next.js 16 / React 19 application uses strict TypeScript, Zod, parameterized SQL, PostgreSQL/PGlite and iron-session. Services live in `src/lib`; authenticated APIs and `POST /webhooks/app` are Next.js route handlers.
 
 | Variable | Purpose |
 |---|---|
-| `APP_URL` | Exact public origin; also used for server-to-server Event Lab deliveries |
-| `SESSION_SECRET` | At least 32 random characters; encrypts eight-hour sessions |
-| `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH` | Admin login; hash is `salt:scrypt(password,salt,64).hex` |
-| `ANALYST_USERNAME`, `ANALYST_PASSWORD_HASH` | Optional analyst credentials; cannot import or use Event Lab |
-| `WEBHOOK_SECRET` | At least 32 random characters; shared with the app-event sender |
-| `ANALYSIS_DATE` | Historical reference date; defaults to `2026-09-28` |
-| `DATABASE_URL` | PostgreSQL URL for hosted production, with verified TLS |
-| `PGLITE_PATH` | Optional local persistent database directory; default `.data/postgres` |
-| `AZURE_AI_ENDPOINT` | Azure OpenAI-compatible resource endpoint, without `/openai/v1` |
-| `AZURE_AI_DEPLOYMENT`, `AZURE_AI_KEY` | Existing approved Foundry deployment and server-only credential |
+| `APP_URL` | Exact public origin and Event Lab delivery target |
+| `SESSION_SECRET` | At least 32 random characters; seals eight-hour sessions |
+| `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH` | Admin login; hash format `salt:scrypt(password,salt,64).hex` |
+| `ANALYST_USERNAME`, `ANALYST_PASSWORD_HASH` | Optional analyst login, without imports/Event Lab |
+| `WEBHOOK_SECRET` | At least 32 random characters shared with event sender |
+| `ANALYSIS_DATE` | Historical reference date, default `2026-09-28` |
+| `DATABASE_URL` | Hosted PostgreSQL URL with verified TLS; required in production |
+| `PGLITE_PATH` | Local persistent database directory, default `.data/postgres` |
+| `AZURE_AI_ENDPOINT`, `AZURE_AI_DEPLOYMENT`, `AZURE_AI_KEY` | Server-only approved Azure model configuration; endpoint excludes `/openai/v1` |
 
-See `.env.example`. Production refuses the embedded database fallback. Local AI configuration is optional for startup; a live assistant requires the three Azure AI variables. The standard [Azure OpenAI v1 Chat Completions endpoint](https://learn.microsoft.com/en-us/azure/foundry/openai/latest) is used server-side.
+See `.env.example`. Missing AI configuration returns an explicit unavailable state while other features remain usable. Use `ALLOW_LOCAL_DB=1` with `npm start` only to inspect a locally built optimized release; leave it unset in hosted production.
 
-## Webhook protocol
+## Webhook contract
 
-Send JSON with `event_id`, `event` (`app_open`, `read_story`, `link_click`, `login`), nullable `user_id`, `device_id`, ISO timestamp and bounded scalar `properties`. Login requires a user ID.
-
-Headers:
+JSON fields: `event_id`, `event` (`app_open`, `read_story`, `link_click`, `login`), nullable `user_id`, `device_id`, ISO timestamp and bounded scalar `properties`. Login requires a user ID.
 
 ```text
 Content-Type: application/json
 X-TPO-Timestamp: <current Unix seconds>
-X-TPO-Signature: sha256=<hex HMAC-SHA256(secret, timestamp + '.' + raw JSON body)>
+X-TPO-Signature: sha256=<HMAC-SHA256(secret, timestamp + '.' + exact raw JSON body)>
 ```
 
-Keep the exact body bytes used for signing. Signing time is actual wall-clock time, independent of the historical event time. Requests outside five minutes are rejected. Identical retries return 200 and `duplicate:true`; new events return 201; conflicting reuse returns 409. The database, not process memory, enforces uniqueness. `test_` event IDs reserve an isolated namespace requiring `test_` device and user IDs.
+Signing time uses the actual clock, independent of historical event time; tolerance is five minutes. New events return 201, identical retries 200 with `duplicate:true`, conflicting reuse 409. The database enforces idempotency. Reserved `test_` events require matching test device/user identifiers and stay outside audience analytics. `npm run webhook:send -- /path/to/event.json` sends a signed delivery; without a file it creates a demonstration event that changes live metrics. Event Lab provides isolated test traffic.
 
-```sh
-npm run webhook:send -- /path/to/event.json
-```
+## Review and submission
 
-Without a file the sender creates a clearly named demonstration event and standalone demo user, which changes live app analytics. Prefer Event Lab when you want isolated test traffic.
+[Architecture](docs/ARCHITECTURE.md), [data/metric definitions](docs/DATA_DICTIONARY.md), [security](docs/SECURITY.md), [deployment](docs/DEPLOYMENT.md) and [verification](docs/VERIFICATION.md) cover operation, reproduction and remaining limits. Linux CI builds and deploys to the existing Azure app using scoped OIDC. No manual Linux ZIP download is needed.
 
-## Verification
+[Engineering ownership](docs/DEVELOPMENT_PROCESS.md) documents Saurabh Rai's architecture, database, product, privacy/security, infrastructure, source review, browser/E2E involvement and technical acceptance, alongside AI-assisted code generation and recorded automated execution. Point 9 of the single [raw nine-question self-audit](docs/SELF_AUDIT.md) directly records these responsibilities; that complete response remains verbatim and identifies its source snapshot through the integrity manifest.
 
-```sh
-npm run typecheck
-npm run lint
-npm test
-npx playwright install chromium
-npm run test:e2e
-npm run build
-npm audit
-```
+The **Loom walkthrough recording remains a required submission deliverable** and has not been recorded. Personal recording preparation, dialogue and media stay outside tracked source.
 
-To check a locally running optimized release with the configured real Azure model: `node node_modules/@playwright/test/cli.js test --config playwright.release.config.ts`. This optional check makes a live inference request and writes the actual screenshots under `docs/`. After a local build, set `ALLOW_LOCAL_DB=1` before `npm start` only when testing the embedded database in production mode; leave this override unset in hosted production. `node scripts/check-release.mjs` checks release artifacts for configured secret values.
+Known limits include fixed AI intents, snapshot rather than longitudinal retention data, conservative shared-device linking, no staff MFA/selective session revocation, and unverified Docker execution/backup restoration. Wider rollout needs measured scale and operational hardening.
 
-Tests load the supplied datasets into isolated PostgreSQL engines. Browser tests use port 43187 and their own database, with no Azure inference charges; the unavailable-model UI is intentionally tested. `npx tsx scripts/smoke.ts` exercises the local configured live Azure connection and saves a safe aggregate result. Automated checks, observed results and remaining limits are recorded in [docs/VERIFICATION.md](docs/VERIFICATION.md).
+## Ownership and assessment use
 
-## Hosting and submission
-
-Azure App Service + PostgreSQL Flexible Server configuration is in `infra/main.bicep`, with an unprivileged optional Docker runtime. The approved Azure demo is deployed and verified. [Deployment instructions](docs/DEPLOYMENT.md) cover actual cloud acceptance, cost, migration, secrets, IP allowlisting, scoped GitHub OIDC delivery and automatic removal. Linux CI builds the hosted release bundle; Windows standalone junctions are not portable. No manual Linux ZIP download is required.
-
-[Architecture decisions](docs/ARCHITECTURE.md), [security and privacy](docs/SECURITY.md), [data dictionary](docs/DATA_DICTIONARY.md), [raw self-audit](docs/SELF_AUDIT.md), and [Loom recording plan](docs/LOOM_PLAN.md) document the submission. The recording itself still needs to be made.
-
-Known limits: fixed safe AI intents rather than unrestricted natural-language SQL; snapshot data cannot measure historical open transitions or true retention; shared devices are deliberately under-linked; staff authentication has no MFA/per-session revocation; backup restoration and Docker execution remain unverified. There are no fabricated app events or inferred newsletter-open timelines in the initial dataset. [Final A–F review](docs/REFACTOR_REVIEW.md) and the [current unedited nine-question audit](docs/SELF_AUDIT.md) record findings, evidence and responsibilities.
+© 2026 **Saurabh Rai · Saurabhzz9**. Provided for hiring assessment evaluation only. Reuse, redistribution or operational/commercial incorporation of protected submission material requires prior written permission; non-selection does not grant a broader license. See [LICENSE.md](LICENSE.md). The Pour Over's marks, supplied assessment materials, dependencies and fonts retain their respective rights and licenses.

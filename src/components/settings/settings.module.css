@@ -12,7 +12,7 @@
   align-items: center;
   gap: 15px;
   padding: 17px 0;
-  border-bottom: 1px solid #f0f3e8;
+  border-bottom: 1px solid #efebe9;
 }
 .details-list > div:last-child {
   border: 0;
@@ -35,11 +35,11 @@
   position: relative;
   align-items: center;
   justify-content: center;
-  border: 1px dashed #dae5c9;
+  border: 1px dashed #ded8d5;
   border-radius: 7px;
   margin-top: 20px;
   padding: 30px 15px;
-  background: #f9fcf5;
+  background: #faf9f8;
   cursor: pointer;
   gap: 12px;
 }

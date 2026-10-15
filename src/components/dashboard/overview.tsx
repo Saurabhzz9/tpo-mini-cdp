@@ -120,17 +120,17 @@ export default function OverviewScreen() {
               >
                 <defs>
                   <linearGradient id="visitFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#bd614d" stopOpacity={0.2} />
+                    <stop offset="0%" stopColor="#f2817d" stopOpacity={0.2} />
                     <stop
                       offset="100%"
-                      stopColor="#bd614d"
+                      stopColor="#f2817d"
                       stopOpacity={0.01}
                     />
                   </linearGradient>
                 </defs>
                 <CartesianGrid
                   vertical={false}
-                  stroke="#eeeae5"
+                  stroke="#efebe9"
                   strokeDasharray="3 3"
                 />
                 <XAxis
@@ -145,16 +145,16 @@ export default function OverviewScreen() {
                   minTickGap={45}
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fill: "#929089", fontSize: 11 }}
+                  tick={{ fill: "#746b67", fontSize: 11 }}
                 />
                 <YAxis
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fill: "#929089", fontSize: 11 }}
+                  tick={{ fill: "#746b67", fontSize: 11 }}
                 />
                 <Tooltip
                   contentStyle={{
-                    border: "1px solid #e7e2db",
+                    border: "1px solid #e9e5e3",
                     borderRadius: 8,
                     fontSize: 12,
                   }}
@@ -163,7 +163,7 @@ export default function OverviewScreen() {
                   isAnimationActive={false}
                   type="monotone"
                   dataKey="visits"
-                  stroke="#ba604d"
+                  stroke="#d86763"
                   strokeWidth={2.5}
                   fill="url(#visitFill)"
                 />
@@ -210,13 +210,13 @@ export default function OverviewScreen() {
                     style={{
                       width: `${(a.count / Math.max(...d.acquisition.map((x) => x.count), 1)) * 100}%`,
                       background: [
-                        "#b66350",
-                        "#d79f70",
-                        "#788b70",
-                        "#97a7aa",
-                        "#b3a1b2",
-                        "#c6b895",
-                        "#b7bbad",
+                        "#e07874",
+                        "#d2a17c",
+                        "#829b8d",
+                        "#96a9b7",
+                        "#b7a4b5",
+                        "#c5b797",
+                        "#b9b7b2",
                       ][i],
                     }}
                   />
@@ -239,35 +239,35 @@ export default function OverviewScreen() {
             <i
               style={{
                 flex: Math.max(0, total - s.inactive),
-                background: "#7a8d73",
+                background: "#668c76",
               }}
             />
             <i
               style={{
                 flex: Math.max(0, s.inactive - s.neverOpened),
-                background: "#d6aa75",
+                background: "#c29b68",
               }}
             />
-            <i style={{ flex: s.neverOpened, background: "#d8d4cd" }} />
+            <i style={{ flex: s.neverOpened, background: "#dcd6d2" }} />
           </div>
           <div className={css(styles, "health-stats")}>
             <div>
               <span>
-                <i style={{ background: "#7a8d73" }} />
+                <i style={{ background: "#668c76" }} />
                 Opened in 30 days
               </span>
               <strong>{fmt(total - s.inactive)}</strong>
             </div>
             <div>
               <span>
-                <i style={{ background: "#d6aa75" }} />
+                <i style={{ background: "#c29b68" }} />
                 30+ days since open
               </span>
               <strong>{fmt(s.inactive - s.neverOpened)}</strong>
             </div>
             <div>
               <span>
-                <i style={{ background: "#d8d4cd" }} />
+                <i style={{ background: "#dcd6d2" }} />
                 Never opened
               </span>
               <strong>{fmt(s.neverOpened)}</strong>
