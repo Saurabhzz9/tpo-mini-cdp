@@ -1,0 +1,23 @@
+{
+  "sourceCommit": "c98518de5e1d22863b8c3123ade5140dde94e0ff",
+  "applicationCommit": "b467b76e4570fef61c12f4d307b39b523997ccc8",
+  "prompt": {
+    "path": "self-audit-prompt.txt",
+    "sha256": "118DB62A31790501429AF6416EE496DAB6646CB8A64EF873E89FA98092C7AA1E",
+    "windowsWorkingCopySha256": "8718DD2BA96FE187A7F256FF8692057BB2670E17BBE6E88069843D533B25DCCB",
+    "unchanged": true
+  },
+  "response": {
+    "path": "SELF_AUDIT.md",
+    "sha256": "A3D8FD1FFC0B23D1FB6ABE0ADA7A4A25A13E7F960657EE6A2093CC5259BAEA04",
+    "preservedAsFirstWritten": true,
+    "questionsAnswered": 9
+  },
+  "context": [
+    "Repository source and commit history",
+    "Existing CI and hosted verification evidence; test suites not rerun",
+    "Recorded project decisions and the developer's account of architecture, database, product, privacy, webhook, infrastructure, review, manual browser testing, E2E direction and acceptance responsibilities"
+  ],
+  "authorship": "Implementing assistant self-assessment; not an independent audit",
+  "historicalResponses": "Preserved in Git history; only the current raw response is tracked"
+}
