@@ -1311,6 +1311,7 @@ tbody tr:hover {
 }
 .match-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 11px;
   align-items: center;
   padding: 0 24px 19px;

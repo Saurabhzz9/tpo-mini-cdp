@@ -1209,8 +1209,8 @@ function SegmentsScreen() {
           <div>
             <h2>{editId ? "Edit saved segment" : "Build your audience"}</h2>
             <p>
-              Unique newsletter subscribers only. Conditions evaluate against
-              live data.
+              Each reader counted once. Choose newsletter readers or all
+              profiles, including standalone app users.
             </p>
           </div>
           <Layers3 size={19} />
@@ -1225,6 +1225,22 @@ function SegmentsScreen() {
           />
         </label>
         <div className="match-row">
+          <label>
+            Audience scope
+            <select
+              aria-label="Audience scope"
+              value={definition.scope || "newsletter"}
+              onChange={(e) =>
+                change({
+                  ...definition,
+                  scope: e.target.value as "newsletter" | "all",
+                })
+              }
+            >
+              <option value="newsletter">Newsletter readers</option>
+              <option value="all">All profiles, including app-only</option>
+            </select>
+          </label>
           Find readers who match{" "}
           <select
             aria-label="Match mode"
@@ -1405,6 +1421,11 @@ function SegmentsScreen() {
               <Layers3 size={19} />
             </div>
             <h3>{s.name}</h3>
+            <Badge>
+              {s.definition.scope === "all"
+                ? "All reader profiles"
+                : "Newsletter readers"}
+            </Badge>
             <p>
               {s.definition.rules
                 .map((r) => `${labels[r.field]} ${r.operator} ${r.value}`)

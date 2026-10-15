@@ -1,12 +1,13 @@
 {
-  "verifiedAt": "2026-10-15T12:46:23.715Z",
+  "verifiedAt": "2026-10-15T13:11:07.662Z",
   "status": 200,
-  "answer": "The “engaged” segment contains 118 records with a score of at least 60. The segment reference is an opaque link, not a person. No further characteristics are provided.",
+  "answer": "As of 2026-09-28, 118 records matched the newsletter segment rule of score ≥ 60. The segment reference is an opaque link, not a person. This aggregate does not provide individual-level details.",
   "data": {
     "metric": "segment",
-    "segmentReference": "5ad73487-1063-4271-af62-b295f8792fe0",
+    "segmentReference": "e5bb721b-f94b-4377-aa7f-8b251e72bbf5",
     "count": 118,
     "definition": {
+      "scope": "newsletter",
       "match": "all",
       "rules": [
         {
@@ -21,6 +22,7 @@
     "metric": "segment",
     "segment": "engaged",
     "definition": {
+      "scope": "newsletter",
       "match": "all",
       "rules": [
         {

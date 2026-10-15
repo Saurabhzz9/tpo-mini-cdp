@@ -40,7 +40,7 @@ export async function getPeople(): Promise<Person[]> {
     return {
       ...p,
       days_inactive: d,
-      never_opened: !p.last_open_date,
+      never_opened: p.newsletter && !p.last_open_date,
       score: newsletter + website + app,
       score_breakdown: { newsletter, website, app },
     };

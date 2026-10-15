@@ -7,7 +7,7 @@ The application was built from scratch in this repository. The assessment PDF's 
 | `npm run import` against the supplied CSVs | 2,995 subscriber rows, 930 app accounts, 10,000 website events persisted; raw total 13,925 |
 | Source reconciliation through unit/integration tests | 2,900 canonical subscribers; 85 duplicate groups; 8 blank rows; 2 invalid emails; 900 matched / 30 unmatched app accounts; 8,441 resolved website events |
 | `npm run typecheck` | Passed |
-| `npm test` | 28 tests passed against isolated in-memory PostgreSQL, including full supplied datasets, concurrency, rollback, device ambiguity, model-request captures and model-proposed segment validation |
+| `npm test` | 28 tests passed against isolated in-memory PostgreSQL, including full supplied datasets, concurrency, rollback, device ambiguity, unknown-user segment scope, model-request captures and model-proposed segment validation |
 | `npm run test:e2e` | All 10 browser scenarios passed; isolated persistent database and dedicated port 43187 |
 | `node node_modules/@playwright/test/cli.js test --grep 'quality filters'` after quality-history/identity additions | Passed |
 | `npm run build` | Optimized production build passed, all routes generated, standalone output prepared |
@@ -29,6 +29,7 @@ Desktop, assistant and mobile screenshots in this directory are from the actual 
 - Initial browser run passed eight scenarios but found a route-announcer selector collision and insufficient small-text contrast. Those were corrected; the subsequent full ten-scenario suite passed, including automated WCAG A/AA checks.
 - A standard local test port collided with another existing application. No unrelated process was stopped; tests moved to dedicated port 43187.
 - The configured Azure model requires `reasoning_effort: none` for function tools on Chat Completions. The segment planner was corrected and then verified against the real deployment.
+- Final review expanded segment scope to include standalone app profiles without changing newsletter totals. Signed malformed JSON shapes are validated before test-namespace inspection and return 400.
 - Next.js copies loaded `.env` files into standalone builds. The release preparation removes those files; a separate artifact scan confirms configured credentials are absent from the resulting text artifacts.
 
 ## Not verified or not completed

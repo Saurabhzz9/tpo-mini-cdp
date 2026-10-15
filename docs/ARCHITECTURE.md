@@ -20,7 +20,7 @@ HMAC-SHA256 covers `timestamp.rawBody`. Five-minute request tolerance and consta
 
 Event timestamp and ingestion timestamp are separate. Every delivery recomputes the affected device association. Anonymous events at or before a valid login attach only when exactly one explicit user has ever claimed the device. A second user revokes inferred mappings on anonymous events, even if delivered later; explicit user assignments stay intact. Anonymous events after the latest login remain unresolved. This intentionally under-links shared devices rather than guessing session ownership.
 
-Unknown IDs create standalone app accounts and profiles within the same transaction. Test namespace events are derived from the signed event ID (`test_`); the unsigned test header is not trusted. Test identities and events are excluded from audience analytics. Timelines and dynamic segment queries see committed events immediately, with periodic browser refresh.
+Unknown IDs create standalone app accounts and profiles within the same transaction. Test namespace events are derived from the signed event ID (`test_`); the unsigned test header is not trusted. Test identities and events are excluded from audience analytics. Timelines and dynamic segment queries see committed events immediately, with periodic browser refresh. Segments default to newsletter readers but can explicitly include all profiles, retaining unknown app users in app-activity audiences. Aggregate app-engagement queries also include standalone identities; never-opened newsletter flags apply only to newsletter records.
 
 ## Historical analysis
 

@@ -10,7 +10,7 @@ import {
 } from "@/lib/auth";
 import { query } from "@/lib/db";
 import { getPeople, overview, profile } from "@/lib/audience";
-import { segmentSchema, matches, exportPeople } from "@/lib/segments";
+import { segmentSchema, segmentMembers, exportPeople } from "@/lib/segments";
 import { importCSV } from "@/lib/importer";
 import { askAssistant } from "@/lib/assistant";
 import { eventSchema, sign } from "@/lib/webhook";
@@ -135,18 +135,14 @@ async function handler(
       return NextResponse.json(
         segments.map((x) => ({
           ...x,
-          count: people.filter(
-            (p) =>
-              p.newsletter && matches(p, segmentSchema.parse(x.definition)),
-          ).length,
+          count: segmentMembers(people, segmentSchema.parse(x.definition))
+            .length,
         })),
       );
     }
     if (path === "segments/preview" && write) {
       const definition = segmentSchema.parse(JSON.parse(await readBody(req))),
-        people = (await getPeople()).filter(
-          (p) => p.newsletter && matches(p, definition),
-        );
+        people = segmentMembers(await getPeople(), definition);
       return NextResponse.json({
         count: people.length,
         people: people.slice(0, 25),
@@ -178,9 +174,7 @@ async function handler(
       )[0];
       if (!segment) throw new HttpError(404, "Segment not found");
       const definition = segmentSchema.parse(segment.definition),
-        people = (await getPeople()).filter(
-          (p) => p.newsletter && matches(p, definition),
-        );
+        people = segmentMembers(await getPeople(), definition);
       await query(
         "INSERT INTO audit_log(action,actor,detail) VALUES($1,$2,$3)",
         [

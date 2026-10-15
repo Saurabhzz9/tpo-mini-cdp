@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { verifySignature, ingestEvent } from "@/lib/webhook";
+import { verifySignature, ingestEvent, eventSchema } from "@/lib/webhook";
 import { readBody, HttpError, rateLimit } from "@/lib/auth";
 import { z } from "zod";
 export const runtime = "nodejs";
@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       process.env.WEBHOOK_SECRET,
     );
     await rateLimit("webhook-authenticated", 300);
-    const input = JSON.parse(body);
+    const input = eventSchema.parse(JSON.parse(body));
     const test =
       typeof input.event_id === "string" && input.event_id.startsWith("test_");
     if (

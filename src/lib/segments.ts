@@ -63,11 +63,18 @@ export const ruleSchema = z
   });
 export const segmentSchema = z
   .object({
+    scope: z.enum(["newsletter", "all"]).optional(),
     match: z.enum(["all", "any"]),
     rules: z.array(ruleSchema).min(1).max(15),
   })
   .strict();
 export type Segment = z.infer<typeof segmentSchema>;
+export function segmentMembers(people: Person[], definition: Segment) {
+  return people.filter(
+    (p) =>
+      (definition.scope === "all" || p.newsletter) && matches(p, definition),
+  );
+}
 export function matches(p: Person, definition: Segment) {
   const values = definition.rules.map((r) => {
     let actual: unknown;

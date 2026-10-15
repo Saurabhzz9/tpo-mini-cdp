@@ -5,7 +5,12 @@ import { importCSV, sourceDate } from "../src/lib/importer";
 import { normalizeEmail } from "../src/lib/identity";
 import { ingestEvent, verifySignature, sign } from "../src/lib/webhook";
 import { getPeople, overview } from "../src/lib/audience";
-import { matches, segmentSchema, csvCell } from "../src/lib/segments";
+import {
+  matches,
+  segmentSchema,
+  csvCell,
+  segmentMembers,
+} from "../src/lib/segments";
 import {
   classifyQuestion,
   safeAnalytics,
@@ -254,6 +259,16 @@ describe("durable webhook processing", () => {
     )!;
     expect(p.newsletter).toBe(false);
     expect(p.app_events).toBe(5);
+    const activity: import("../src/lib/segments").Segment = {
+      match: "all",
+      rules: [{ field: "story_reads", operator: "gte", value: 1 }],
+    };
+    expect(segmentMembers([p], activity)).toHaveLength(0);
+    expect(segmentMembers([p], { ...activity, scope: "all" })).toHaveLength(1);
+    expect(await safeAnalytics({ metric: "engagement" })).toHaveProperty(
+      "observedAppReaders",
+      null,
+    );
     expect(
       matches(p, {
         match: "all",

@@ -66,6 +66,7 @@ export function classifyQuestion(question: string): Args {
 }
 function approvedDefinition(args: Args) {
   return segmentSchema.parse({
+    scope: args.segment === "app-readers" ? "all" : "newsletter",
     match: "all",
     rules: [
       ...(args.source
@@ -91,7 +92,8 @@ function approvedDefinition(args: Args) {
 }
 const canonicalDefinition = (d: z.infer<typeof segmentSchema>) =>
   JSON.stringify({
-    ...d,
+    scope: d.scope || "newsletter",
+    match: d.match,
     rules: [...d.rules].sort((a, b) => a.field.localeCompare(b.field)),
   });
 const suppress = (n: number) => (n > 0 && n < 5 ? null : n);
@@ -99,7 +101,11 @@ export async function safeAnalytics(input: unknown) {
   const args = toolArgs.parse(input),
     all = await getPeople(),
     people = all.filter(
-      (p) => p.newsletter && (!args.source || p.source === args.source),
+      (p) =>
+        (p.newsletter ||
+          args.metric === "engagement" ||
+          (args.metric === "segment" && args.segment === "app-readers")) &&
+        (!args.source || p.source === args.source),
     );
   if (args.metric === "segment") {
     const definition = approvedDefinition(args);
@@ -137,6 +143,8 @@ export async function safeAnalytics(input: unknown) {
   if (args.metric === "engagement")
     return {
       metric: "engagement",
+      audience:
+        "All canonical reader profiles; newsletter measures use observed newsletter records only",
       newsletterRecent: suppress(
         people.filter((p) => p.days_inactive !== null && p.days_inactive < 30)
           .length,
@@ -256,7 +264,7 @@ export async function askAssistant(
         {
           role: "system",
           content:
-            "Build one safe structured newsletter segment. For inactive readers use days_inactive >= 30 (excludes never-opened). For engaged readers use score >= 60. For app-readers use story_reads >= 2. If a source is supplied require source equals that exact value. Combine all conditions with match all. Call buildSegmentDefinition; do not produce text.",
+            "Build one safe structured reader segment. For inactive readers use scope newsletter and days_inactive >= 30 (excludes never-opened). For engaged readers use scope newsletter and score >= 60. For app-readers use scope all and story_reads >= 2. If a source is supplied require source equals that exact value. Combine all conditions with match all. Call buildSegmentDefinition; do not produce text.",
         },
         { role: "user", content: JSON.stringify(args) },
       ],

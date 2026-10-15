@@ -133,6 +133,15 @@ test("signed live webhook delivery updates subscriber segments without restart",
   };
   const body = JSON.stringify(event),
     ts = String(Math.floor(Date.now() / 1000));
+  const malformed = await page.request.post("/webhooks/app", {
+    headers: {
+      "content-type": "application/json",
+      "x-tpo-timestamp": ts,
+      "x-tpo-signature": `sha256=${sign("null", ts, "test-webhook-secret-at-least-32-characters-long")}`,
+    },
+    data: "null",
+  });
+  expect(malformed.status()).toBe(400);
   const response = await page.request.post("/webhooks/app", {
     headers: {
       "content-type": "application/json",
@@ -154,6 +163,31 @@ test("signed live webhook delivery updates subscriber segments without restart",
   await page.getByRole("link", { name: "Segments", exact: true }).click();
   await page.getByRole("button", { name: "Repeat app readers" }).click();
   await page.getByLabel("Condition 2 value").fill("1");
+  await page.getByRole("button", { name: "Preview audience" }).click();
+  await expect(
+    page.getByRole("heading", { name: "1 matching readers" }),
+  ).toBeVisible();
+  const unknownBody = JSON.stringify({
+    ...event,
+    event_id: "e2e_unknown_read",
+    user_id: "e2e_unknown_reader",
+    device_id: "e2e_unknown_device",
+  });
+  const unknown = await page.request.post("/webhooks/app", {
+    headers: {
+      "content-type": "application/json",
+      "x-tpo-timestamp": ts,
+      "x-tpo-signature": `sha256=${sign(unknownBody, ts, "test-webhook-secret-at-least-32-characters-long")}`,
+    },
+    data: unknownBody,
+  });
+  expect(unknown.status()).toBe(201);
+  await page.getByLabel("Audience scope").selectOption("all");
+  await page.getByRole("button", { name: "Preview audience" }).click();
+  await expect(
+    page.getByRole("heading", { name: "2 matching readers" }),
+  ).toBeVisible();
+  await page.getByLabel("Audience scope").selectOption("newsletter");
   await page.getByRole("button", { name: "Preview audience" }).click();
   await expect(
     page.getByRole("heading", { name: "1 matching readers" }),

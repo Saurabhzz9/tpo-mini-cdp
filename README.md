@@ -24,7 +24,7 @@ The three synthetic assessment CSVs are included in `data/`. Importing the same 
 - Overview from real data: 2,900 canonical newsletter identities, 10,000 website visits, 8,441 resolved visits and 900 linked app accounts. These are source verification results, not constants used by the dashboard.
 - Search by email, profile ID, app user ID, visitor ID or source. Subscriber 360 includes newsletter snapshots, website/app chronology, identity links and original source rows.
 - Raw duplicate preservation, invalid/blank record flags, unmatched app accounts and anonymous visitor coverage.
-- AND/OR segments with previews, save/edit/delete, current membership and formula-safe authorized CSV export.
+- AND/OR segments with newsletter/all-profile scope, previews, save/edit/delete, current membership and formula-safe authorized CSV export.
 - HMAC-protected `POST /webhooks/app`: persisted idempotency, conflicting duplicate rejection, event-time ordering, unknown users and safe anonymous device backfill.
 - Isolated Event Lab for actual signed deliveries, duplicate retries and out-of-order demonstrations.
 - Acquisition comparisons, signup cohorts, transparent engagement scoring and observed channel relationships.
