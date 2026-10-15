@@ -1,0 +1,36 @@
+{
+  "verifiedAt": "2026-10-15T12:46:23.715Z",
+  "status": 200,
+  "answer": "The “engaged” segment contains 118 records with a score of at least 60. The segment reference is an opaque link, not a person. No further characteristics are provided.",
+  "data": {
+    "metric": "segment",
+    "segmentReference": "5ad73487-1063-4271-af62-b295f8792fe0",
+    "count": 118,
+    "definition": {
+      "match": "all",
+      "rules": [
+        {
+          "field": "score",
+          "operator": "gte",
+          "value": 60
+        }
+      ]
+    }
+  },
+  "request": {
+    "metric": "segment",
+    "segment": "engaged",
+    "definition": {
+      "match": "all",
+      "rules": [
+        {
+          "field": "score",
+          "operator": "gte",
+          "value": 60
+        }
+      ]
+    }
+  },
+  "provider": "Azure AI Foundry",
+  "privacy": "Only validated intent and aggregate results sent to model. Your original message stays on this server."
+}

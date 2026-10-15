@@ -1,0 +1,18 @@
+{
+  "verifiedAt": "2026-10-15T12:36:41.699Z",
+  "status": 200,
+  "answer": "For Instagram, 86 subscribers had not opened a newsletter in 30+ days, and 146 had never opened one. Never-opened subscribers are reported separately from the 30+ day inactive group. These counts do not provide a total audience or explain why subscribers did not open. Data date: 2026-09-28.",
+  "data": {
+    "metric": "inactive",
+    "source": "Instagram",
+    "inactive30Days": 86,
+    "neverOpened": 146,
+    "definition": "30+ days since last newsletter open; never-opened reported separately"
+  },
+  "request": {
+    "metric": "inactive",
+    "source": "Instagram"
+  },
+  "provider": "Azure AI Foundry",
+  "privacy": "Only validated intent and aggregate results sent to model. Your original message stays on this server."
+}

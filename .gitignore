@@ -1,0 +1,12 @@
+node_modules/
+.next/
+.next-e2e/
+.env*
+!.env.example
+.data/
+data/*.pdf
+playwright-report/
+test-results/
+*.tsbuildinfo
+tmp/
+.local-access.txt

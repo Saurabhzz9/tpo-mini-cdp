@@ -1,0 +1,11 @@
+node_modules
+.next*
+.data
+.env*
+.local-access.txt
+.git
+data
+test-results
+playwright-report
+tests
+tmp

@@ -1,0 +1,33 @@
+{
+  "app_users.csv": {
+    "sha256": "b44b3be3df8b66c125e32c522b82ac6497a4a721f4473312fea58d280dcaf556",
+    "rows": 930,
+    "columns": [
+      "user_id",
+      "email",
+      "created_at"
+    ]
+  },
+  "subscribers.csv": {
+    "sha256": "ca4a1dc36ab10203d1e8f9f484a3d0e05f8ed1caacd31d73037b4af0bd0b21b6",
+    "rows": 2995,
+    "columns": [
+      "email",
+      "signup_date",
+      "status",
+      "acquisition_source",
+      "last_open_date"
+    ]
+  },
+  "web_events.csv": {
+    "sha256": "9a64859020cc2999e0c21beab19676d97047d740e42db4ba0c13055843b80050",
+    "rows": 10000,
+    "columns": [
+      "visitor_id",
+      "page",
+      "timestamp",
+      "utm_source",
+      "email"
+    ]
+  }
+}

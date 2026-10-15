@@ -1,0 +1,44 @@
+{
+  "name": "tpo-mini-cdp",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --webpack",
+    "build": "next build --webpack && node scripts/clean-release.mjs",
+    "start": "node scripts/start.mjs",
+    "setup": "tsx scripts/setup.ts",
+    "import": "tsx scripts/import.ts",
+    "migrate": "tsx scripts/migrate.ts",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "typecheck": "next typegen && tsc --noEmit",
+    "webhook:send": "tsx scripts/send-webhook.ts"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "0.5.10",
+    "csv-parse": "7.0.3",
+    "dotenv": "^17.3.1",
+    "iron-session": "^8.0.4",
+    "lucide-react": "^0.577.0",
+    "next": "16.4.1",
+    "pg": "^8.16.3",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "react-is": "^19.3.1",
+    "recharts": "^3.8.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.58.2",
+    "@types/node": "^24.12.0",
+    "@types/pg": "^8.16.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "prettier": "^3.9.10",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vitest": "4.1.11"
+  },
+  "type": "module"
+}
