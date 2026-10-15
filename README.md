@@ -2,6 +2,8 @@
 
 A working mini customer data platform for the Growth team: preserved CSV source records, unified reader profiles, live app events, dynamic segments, acquisition insights and a privacy-constrained Azure AI assistant.
 
+Assessment demo: Azure hosting is limited to **14 days, ending October 29, 2026**. The approved target is approximately **US$30/month**; the selected fixed hosting estimate is US$28.50/month before light inference, network usage and taxes. The dedicated demo resources are scheduled for removal on October 29 at 12:00 IST. See [deployment and cleanup](docs/DEPLOYMENT.md) for live acceptance status, exact inventory and cost limits.
+
 ![The actual Reader Intelligence dashboard](docs/overview.png)
 
 ## Run locally
@@ -28,7 +30,10 @@ The three synthetic assessment CSVs are included in `data/`. Importing the same 
 - HMAC-protected `POST /webhooks/app`: persisted idempotency, conflicting duplicate rejection, event-time ordering, unknown users and safe anonymous device backfill.
 - Isolated Event Lab for actual signed deliveries, duplicate retries and out-of-order demonstrations.
 - Acquisition comparisons, signup cohorts, transparent engagement scoring and observed channel relationships.
+
 - Azure AI aggregate answers and structured segment proposals. User text is projected to an approved intent before inference; source PII and raw messages never enter model requests. Missing configuration returns an explicit unavailable state.
+
+The workspace is organized into feature components and scoped CSS Modules, with an authenticated server layout and a persistent navigation shell. [Architecture findings and verification](docs/REFACTOR_REVIEW.md) describe the changes and limits. [Development responsibilities](docs/DEVELOPMENT_PROCESS.md) distinguish human engineering direction and developer-reported review/testing from AI-generated implementation and recorded automated execution. The original raw self-audit is preserved.
 
 ## Architecture and environment
 
@@ -73,6 +78,7 @@ Without a file the sender creates a clearly named demonstration event and standa
 
 ```sh
 npm run typecheck
+npm run lint
 npm test
 npx playwright install chromium
 npm run test:e2e

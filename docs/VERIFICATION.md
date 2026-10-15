@@ -1,6 +1,6 @@
 # Verification report — October 15, 2026
 
-The application was built from scratch in this repository. The assessment PDF's three pages and all three source CSVs were inspected before implementation. Source checksums and fields are recorded in `source-manifest.json`.
+The application was built from scratch in this repository. The assessment PDF's three pages and all three source CSVs were inspected before implementation. Source checksums and fields are recorded in `source-manifest.json`. The following table records the original implementation baseline; the subsequent refactor results follow below.
 
 | Check actually executed | Observed result |
 |---|---|
@@ -32,12 +32,22 @@ Desktop, assistant and mobile screenshots in this directory are from the actual 
 - Final review expanded segment scope to include standalone app profiles without changing newsletter totals. Signed malformed JSON shapes are validated before test-namespace inspection and return 400.
 - Next.js copies loaded `.env` files into standalone builds. The release preparation removes those files; a separate artifact scan confirms configured credentials are absent from the resulting text artifacts.
 
-## Not verified or not completed
+## Subsequent refactor and cloud verification
 
-- No public hosted URL, Azure resource provisioning, real cloud PostgreSQL connection or network/firewall/backup restore test. Cost approval remains required by the supplied brief.
+The final refactor passed TypeScript, ESLint, production build and dependency audit. Local Vitest ran 31 passing tests and explicitly skipped three network-only tests without a dedicated URL. All three network tests then passed against an isolated temporary database on the actual Azure PostgreSQL server; that exact temporary database was removed. GitHub Actions independently ran all 34 tests against its PostgreSQL 16 service, plus the complete eleven-scenario Playwright suite and production build. See [the successful verification run](https://github.com/Saurabhzz9/tpo-mini-cdp/actions/runs/38749444049).
+
+All eleven local browser scenarios passed after separating test output directories. Nine before/after visual comparisons also passed against this machine's fixed dataset/browser at a maximum 0.1% differing-pixel threshold. The optimized local release was exercised again with actual Azure inference and desktop/mobile screenshots. These comparisons do not establish a smaller bundle or measured load capacity.
+
+Azure cost approval was subsequently supplied: approximately US$30/month with removal after fourteen days. Dedicated B1 App Service and B1ms PostgreSQL resources were provisioned in West US 3, TLS connectivity and real PostgreSQL concurrency were verified, and schema migrations were applied separately from the non-owner application role. The current hosted acceptance state and cleanup inventory are recorded in [DEPLOYMENT.md](DEPLOYMENT.md). The historical table's "no deployment performed" describes the earlier syntax-only check, not the final resource state.
+
+Exact commands, concrete fixes, visual limitations and failed intermediate executions are in [REFACTOR_REVIEW.md](REFACTOR_REVIEW.md).
+
+## Remaining verification limits
+
+- A backup restore drill has not been executed. Hosted acceptance is reported separately in the deployment runbook.
 - Docker configuration is authored, but Docker is unavailable on this machine and no container execution is claimed.
 - The Loom recording is planned, not recorded. `LOOM_PLAN.md` provides the concrete demonstration sequence.
-- GitHub Actions configuration is included; local test success is separate from a remote workflow result.
+- GitHub Actions verification succeeded; deployment jobs and their acceptance checks are separate from that result.
 - Automated accessibility coverage is the overview plus responsive task flows, not a full manual assistive-technology audit.
 
 See `SECURITY.md` for remaining authentication, CSP and production privilege limitations. No assertion of production hardening or independent penetration testing is made.

@@ -92,6 +92,4 @@ jobs:
       - name: Deploy the verified Linux standalone release
         if: steps.lifetime.outputs.enabled == 'true'
         run: |
-          az webapp config appsettings set --resource-group tpo-mini-cdp-demo-rg --name tpo-cdp-s9-261015 --settings SCM_DO_BUILD_DURING_DEPLOYMENT=false ENABLE_ORYX_BUILD=false --output none
-          az webapp config set --resource-group tpo-mini-cdp-demo-rg --name tpo-cdp-s9-261015 --startup-file "node server.js" --output none
           az webapp deploy --resource-group tpo-mini-cdp-demo-rg --name tpo-cdp-s9-261015 --src-path tpo-linux.zip --type zip --clean true --restart true --timeout 600000 --output none

@@ -1,5 +1,6 @@
 param appName string
-param repository string = 'Saurabhzz9/tpo-mini-cdp'
+@description('Exact subject observed in GitHub OIDC logs, including immutable owner/repository IDs.')
+param githubSubject string = 'repo:Saurabhzz9@74092471/tpo-mini-cdp@1420653576:ref:refs/heads/main'
 param roleAssignmentName string = guid(resourceGroup().id,appName,'github-main-deployment')
 resource site 'Microsoft.Web/sites@2023-12-01' existing = {name:appName}
 resource identity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
@@ -10,7 +11,7 @@ resource identity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' 
 resource federation 'Microsoft.ManagedIdentity/userAssignedIdentities/federatedIdentityCredentials@2023-01-31' = {
   parent:identity
   name:'github-main'
-  properties:{issuer:'https://token.actions.githubusercontent.com',subject:'repo:${repository}:ref:refs/heads/main',audiences:['api://AzureADTokenExchange']}
+  properties:{issuer:'https://token.actions.githubusercontent.com',subject:githubSubject,audiences:['api://AzureADTokenExchange']}
 }
 resource deployRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   scope:site

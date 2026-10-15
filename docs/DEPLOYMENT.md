@@ -1,52 +1,57 @@
-# Azure deployment runbook
+# Azure assessment deployment and removal
 
-Status: configuration is prepared and Bicep syntax compilation has succeeded. No hosting resources have been provisioned for this project, no public URL has been verified, and no costs have been approved. The existing Azure AI deployment was reused for an aggregate smoke test; no model deployment was created.
+The developer approved the cheapest reasonably responsive deployment at approximately US$30/month and explicitly requested removal after fourteen days. Resources were provisioned on October 15, 2026. Cloud PostgreSQL TLS connectivity, schema migration and isolated concurrency tests have passed. Public application acceptance is pending completion of the ZIP deployment; provisioning alone is not a successful release.
 
-## Proposed services and cost approval
+## Dedicated inventory and cost
 
-The template selects Linux App Service Basic B1, PostgreSQL Flexible Server Burstable Standard_B1ms (PostgreSQL 16, 32 GB storage, 7-day backup retention, no HA), and an existing approved Azure AI Foundry deployment. No Redis, Kubernetes, GPU, separate ingestion service or paid observability workspace is introduced.
+Subscription: `e96c8788-8622-4dae-a0b4-ec85fe87fde6`. Region: **West US 3**. Dedicated group: **`tpo-mini-cdp-demo-rg`**, tagged `project=tpo-mini-cdp`, `expiresOn=2026-10-29`, `monthlyBudgetUSD=30`.
 
-Microsoft's public US-dollar example prices checked October 15, 2026 list approximately $13.14/month for [Linux B1](https://azure.microsoft.com/en-us/pricing/details/app-service/linux/) and $12.41/month for [PostgreSQL B1ms compute](https://azure.microsoft.com/en-us/pricing/details/postgresql/flexible-server/). Database storage, inference, egress, taxes and regional variation are additional. A planning envelope is roughly $30–45/month for a small always-on assessment deployment, excluding heavy model usage; this is an estimate, not a subscription-specific quote. Recheck the chosen region and subscription's retail calculator before requesting approval. Do not run resource-creation commands before that approval.
+| Resource | Configuration / purpose |
+|---|---|
+| `tpo-cdp-s9-261015-plan` | Linux App Service Basic B1, one always-on instance |
+| `tpo-cdp-s9-261015` | One Next.js application, Node.js 24 LTS, HTTPS only, TLS 1.2 minimum, FTP disabled |
+| `tpo-cdp-s9-261015-pg` | PostgreSQL 16, Standard B1ms burstable, 32 GB storage, no HA, seven-day backup retention |
+| `tpo-cdp-s9-261015-ci` | Managed identity for GitHub deployment to this exact web app |
+| `tpo-cdp-s9-261015-expiry` | Consumption Logic App with a guarded October 29 deletion schedule |
 
-Create a resource-group cost budget with alerts at 50%, 80% and 100% of the approved amount. Supply the intended recipient explicitly; this repository does not assume an email address or send notifications. Budgets alert rather than impose a hard spending cap. Use a dedicated resource group so cleanup does not affect existing applications.
+The existing Azure AI resource/deployment is reused. It is outside this group and must not be deleted with the demo. No separate backend, Redis, Kubernetes, container registry, GPU or paid monitoring workspace is required.
 
-## Prepare a release on Linux
+The West US 3 public retail rates checked on October 15 were US$0.017/hour for Linux B1, US$0.017/hour for B1ms database compute and US$0.115/GB/month for 32 GB storage. At 730 hours/month this is approximately **US$28.50/month**, or **US$13.15 for fourteen days**, before inference, egress, small consumption-workflow execution charges and taxes. These are estimates, not a hard bill cap. The [Azure Retail Prices API](https://learn.microsoft.com/en-us/rest/api/cost-management/retail-prices/azure-retail-prices) supplies public rates; actual subscription billing can differ.
 
-Use Node.js 24. Windows standalone output may contain absolute junctions and must not be copied to Linux hosting. The Dockerfile builds on Linux and runs as an unprivileged user; alternatively prepare a Linux ZIP:
+A US$30 monthly resource-group budget exists for October. It does not stop resources or cap billing. No email recipient was supplied, so notification emails are not configured. The assistant has a shared ten-request/day demo allowance in addition to the normal staff hourly limit; direct calls outside this app to the shared AI resource are outside that allowance. Managed identities/OIDC do not require a separate paid hosting plan.
 
-```sh
-npm ci
-npm run typecheck
-npm test
-npm run build
-mkdir -p release/.next release/scripts
-cp -R .next/standalone/. release/
-cp -R .next/static release/.next/static
-cp -R public migrations release/
-cp scripts/migrate-prod.mjs release/scripts/
+## Linux package and scoped GitHub deployment
+
+`.github/workflows/ci.yml` installs dependencies, typechecks, lints, runs unit/PostgreSQL/browser tests, builds on Linux, audits production dependencies, scans release text for configured secrets and uploads the standalone ZIP. Its root contains `server.js`, `.next`, dependencies, public assets and migration tooling. Synthetic source CSVs, `.env` files and local credential files are excluded. Windows build junctions are not portable to Linux, which is why the release is built by the Linux CI worker. A manual ZIP download to the developer computer is unnecessary.
+
+The deployment job downloads that verified artifact directly inside GitHub Actions. Azure OIDC exchanges a short-lived GitHub identity token for Azure access; no permanent publish password or Azure client secret is saved in GitHub. Its identity has Website Contributor on **only this web app**, with no database or resource-group deletion authority. Federation requires the exact immutable repository/owner and main-branch subject:
+
+```text
+repo:Saurabhzz9@74092471/tpo-mini-cdp@1420653576:ref:refs/heads/main
 ```
 
-Verify no `.env*`, `.local-access.txt`, `.data`, development credentials, dataset CSVs, screenshots or test traces enter `release/`. Create the ZIP with the release directory contents at archive root, including `.next`; do not wrap everything in a parent directory. See [Azure ZIP deployment requirements](https://learn.microsoft.com/en-us/azure/app-service/deploy-zip). The PowerShell helper illustrates staging but explicitly warns that its Windows build is not a Linux release.
+The deployment job checks the UTC date and skips cloud delivery from October 29 onward. Hosting build automation is disabled for the prebuilt package; startup is `node server.js`. `infra/ci.bicep` reproduces federation and scoped role assignment. When applying it over this existing deployment, retain role assignment name `eea8450e-cff6-40d1-bd36-7985cefa14ff` rather than creating a duplicate assignment.
 
-## Provision only after approval
+Two source-build attempts were unsuccessful: the first omitted build-time TypeScript dependencies, and the second stalled in dependency installation. Their abandoned deployment lock blocked subsequent ZIP attempts with HTTP 409. After verifying the original build process was gone, its exact lock was archived and the app restarted, following [Microsoft's deployment-lock troubleshooting](https://azureossd.github.io/2023/08/14/Troubleshooting-HTTP-409s-when-deploying-to-App-Service/index.html). This is a recorded deployment issue, not a passing acceptance check.
 
-1. Choose the region, globally unique `appName`, dedicated resource group, existing AI deployment and a database password. Generate independent session/signing secrets and a scrypt staff-password hash. Supply secure Bicep parameters through an ignored local parameter file or a secure deployment pipeline; never command-line plaintext or committed parameter values.
-2. Validate `infra/main.bicep` with `az bicep build --file infra/main.bicep`. Run an ARM what-if review before creating resources. The template intentionally does not create an AI deployment.
-3. Create the approved resource group and deploy the template. With the default empty database IP allowlist the database rejects network clients. That is expected; do not enable the broad “allow all Azure services” firewall shortcut.
-4. Read the new web app's `outboundIpAddresses` and `possibleOutboundIpAddresses`. Redeploy with exactly those required IPs in `allowedDatabaseIps`. If importing locally, temporarily allow only the developer's current public IP and remove it afterward. For organizational use prefer private networking.
-5. Use Key Vault references for runtime secrets where practical. Verify `DATABASE_URL` uses `sslmode=verify-full` and the Azure PostgreSQL certificate chain is trusted. `APP_URL` must be the exact HTTPS origin; it controls mutation CSRF checks and internal Event Lab delivery. Keep `ALLOW_LOCAL_DB` unset in hosting.
-6. Deploy the Linux release ZIP using `az webapp deploy --resource-group <group> --name <app> --src-path <zip> --type zip`. Runtime command is `node scripts/migrate-prod.mjs && node server.js`; `PORT=8080` and `HOSTNAME=0.0.0.0` are set in the template. Initial health stays unavailable until the migrations can connect.
-7. Log in, upload the three supplied CSVs through Settings in order, and repeat-upload one to verify checksum idempotency. Alternatively run the CLI importer from an explicitly allowed host against the production `DATABASE_URL` during a maintenance window.
-8. Split migration-owner credentials from the least-privilege application role. Verify backups and a restore into an isolated database. Record app URL, webhook URL, Azure region, deployed commit and database migration version.
+## Database and secret boundaries
 
-## Release acceptance checks
+The `tpo` database uses verified TLS. Schema migrations are applied with the owner account separately; runtime connects as `tpoapp` with CONNECT, schema USAGE, table DML and sequence grants, no schema ownership or CREATE privilege. Changes to the schema require a separate maintenance migration and any new grants. The application never receives the database administrator password.
 
-- `GET /api/health` returns 200, and an anonymous `GET /api/people` returns 401.
-- UI redirects to login before exposing data. Cookie has Secure, HttpOnly, SameSite and eight-hour expiry. HTTP redirects to HTTPS.
-- Baseline totals match the reproducible tests, including 10,000 website events and 8,441 resolved links.
-- Invalid signature and stale signing time are rejected. Signed live delivery, duplicate redelivery, unknown users, anonymous login backfill and shared-device ambiguity work on the actual PostgreSQL server.
-- A newly received real app event appears in profile lookup and changes an applicable dynamic segment without a restart. Test namespace activity does not inflate analytics.
-- Azure assistant returns a real answer and a saved model-proposed segment. Model request capture contains only approved intents/aggregates, never identities.
-- Runtime logs contain safe operation labels, not request bodies, CSV rows, database URLs or credentials.
+The database firewall allows the web app's enumerated outbound and possible outbound IPv4 addresses. The broad allow-all-Azure rule is not enabled. A temporary exact developer-IP rule used for schema preparation/testing must be removed after final database diagnostics. If App Service outbound addresses change, refresh the explicit allowlist before deployment. This public-IP approach is appropriate for the constrained assessment; organizational rollout should evaluate private networking.
 
-Public hosting, actual cloud PostgreSQL integration, Docker image execution and the Loom recording remain separate verification steps. Bicep compilation alone proves none of those.
+Independent cloud staff, session and HMAC credentials were generated. Runtime values are Azure app settings supplied via ignored `infra/demo.local.json`; `.cloud-access.txt` holds the generated local handover login. Neither belongs in Git, screenshots, pipeline artifacts or build context. `ALLOW_LOCAL_DB` is unset in cloud hosting. `APP_URL` is the exact HTTPS origin. Login trusts the final App Service ingress-appended address only in its explicitly configured hosting mode.
+
+## Fourteen-day expiry
+
+`infra/expiry.bicep` schedules the workflow for **October 29, 2026 at 06:30 UTC / 12:00 IST**, recurring daily if necessary. Its system identity can delete only the dedicated group. Before deletion it checks the current time, exact group ownership/expiry tags, a complete inventory without pagination, and that every listed resource has the expected project tag and one of the **five exact resource IDs above**. Unexpected resources cause a failed guard and no deletion. It then requests deletion of this group, including its own workflow and identity.
+
+A pre-expiry guard execution verified the inventory reads and skipped the delete action. Actual future deletion cannot be verified in advance. A Codex follow-up is scheduled for 12:15 IST on October 29 to verify removal and report an actionable failure or completion. It must never delete the shared AI resource or unrelated groups. Removal intentionally makes the hosted assessment URL unavailable; this lifetime should accompany the submitted demo link.
+
+For manual fallback, inspect and compare the exact group inventory and tags first, then delete only `tpo-mini-cdp-demo-rg`. Export any wanted assessment artifacts before expiry. Database backups are not a substitute for preserving data beyond deletion of the server/group. A backup restore drill remains unexecuted.
+
+## Release acceptance evidence
+
+Pending hosted health/login/import/webhook/model/browser checks will be recorded here only after execution. Existing evidence includes three real Azure PostgreSQL integration tests in a temporary database, all 34 CI unit/integration tests, eleven E2E scenarios, production build and the optimized local release's actual Azure inference. These do not yet establish a working public URL.
+
+Docker execution is unverified because Docker is unavailable locally. The Loom recording is still planned. See `REFACTOR_REVIEW.md` and `VERIFICATION.md` for implementation evidence and remaining scope limits.

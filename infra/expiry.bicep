@@ -2,6 +2,13 @@
 param appName string
 param cleanupAt string = '2026-10-29T06:30:00Z'
 var groupUri = uri(environment().resourceManager,resourceGroup().id)
+var allowedIds = [
+  toLower(resourceId('Microsoft.Web/sites',appName))
+  toLower(resourceId('Microsoft.Web/serverfarms','${appName}-plan'))
+  toLower(resourceId('Microsoft.DBforPostgreSQL/flexibleServers','${appName}-pg'))
+  toLower(resourceId('Microsoft.Logic/workflows','${appName}-expiry'))
+  toLower(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities','${appName}-ci'))
+]
 var contributor = subscriptionResourceId('Microsoft.Authorization/roleDefinitions','b24988ac-6180-42a0-ab88-20f7382dd24c')
 resource cleanup 'Microsoft.Logic/workflows@2019-05-01' = {
   name:'${appName}-expiry'
@@ -29,7 +36,7 @@ resource cleanup 'Microsoft.Logic/workflows@2019-05-01' = {
           type:'Query'
           inputs:{
             from:'@body(\'List_resources\')?[\'value\']'
-            where:'@not(contains(createArray(\'${appName}\',\'${appName}-plan\',\'${appName}-pg\',\'${appName}-expiry\',\'${appName}-ci\'),item()?[\'name\']))'
+            where:'@or(not(contains(json(\'${string(allowedIds)}\'),toLower(item()?[\'id\']))),not(equals(item()?[\'tags\']?[\'project\'],\'tpo-mini-cdp\')))'
           }
           runAfter:{List_resources:['Succeeded']}
         }
