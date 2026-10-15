@@ -1,0 +1,70 @@
+{
+  "verifiedAt": "2026-10-15T15:22:05.236Z",
+  "origin": "https://tpo-cdp-s9-261015.azurewebsites.net",
+  "commit": "b467b76e4570fef61c12f4d307b39b523997ccc8",
+  "checks": [
+    {
+      "check": "database-backed health",
+      "status": 200
+    },
+    {
+      "check": "anonymous protection and secure staff login",
+      "passed": true
+    },
+    {
+      "check": "repeat import",
+      "result": {
+        "repeated": true,
+        "rows": 2995,
+        "batchId": "fc288c5b-a60d-4e5d-96b1-c2ef3dd9ea51"
+      }
+    },
+    {
+      "check": "source reconciliation",
+      "summary": {
+        "subscribers": 2900,
+        "active": 2610,
+        "unsubscribed": 290,
+        "inactive": 741,
+        "neverOpened": 470,
+        "appLinked": 900,
+        "webEngaged": 1400,
+        "duplicateGroups": 85,
+        "duplicateRows": 85,
+        "standalone": 30,
+        "webEvents": 10000,
+        "appEvents": 0,
+        "rawRows": 13925,
+        "linkedWebEvents": 8441
+      },
+      "ms": 1072
+    },
+    {
+      "check": "real HTTPS HMAC, stale rejection, unknown user, out-of-order backfill, five concurrent retries, conflict and shared-device revocation",
+      "passed": true
+    },
+    {
+      "check": "test namespace leaves real analytics unchanged",
+      "passed": true
+    },
+    {
+      "check": "dynamic segment evaluation",
+      "count": 118,
+      "ms": 474
+    },
+    {
+      "check": "actual Azure aggregate answer",
+      "status": 200,
+      "ms": 2618
+    },
+    {
+      "check": "actual Azure segment answer",
+      "status": 200,
+      "ms": 4761
+    },
+    {
+      "check": "identifying assistant question rejected before inference",
+      "status": 400
+    }
+  ]
+}

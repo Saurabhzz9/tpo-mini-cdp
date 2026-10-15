@@ -1,6 +1,6 @@
 # Azure assessment deployment and removal
 
-The developer approved the cheapest reasonably responsive deployment at approximately US$30/month and explicitly requested removal after fourteen days. Resources were provisioned on October 15, 2026. Cloud PostgreSQL TLS connectivity, schema migration and isolated concurrency tests have passed. Public application acceptance is pending completion of the ZIP deployment; provisioning alone is not a successful release.
+The developer approved the cheapest reasonably responsive deployment at approximately US$30/month and explicitly requested removal after fourteen days. Resources were provisioned on October 15, 2026. The application is live at **[tpo-cdp-s9-261015.azurewebsites.net](https://tpo-cdp-s9-261015.azurewebsites.net)**. Final source commit `b467b76e4570fef61c12f4d307b39b523997ccc8` passed CI, Azure delivery and actual public API acceptance. The generated staff login is in ignored `.cloud-access.txt`; no password is published here. Hosting ends October 29 at 12:00 IST.
 
 ## Dedicated inventory and cost
 
@@ -52,6 +52,12 @@ For manual fallback, inspect and compare the exact group inventory and tags firs
 
 ## Release acceptance evidence
 
-Pending hosted health/login/import/webhook/model/browser checks will be recorded here only after execution. Existing evidence includes three real Azure PostgreSQL integration tests in a temporary database, all 34 CI unit/integration tests, eleven E2E scenarios, production build and the optimized local release's actual Azure inference. These do not yet establish a working public URL.
+Final [CI and deployment run](https://github.com/Saurabhzz9/tpo-mini-cdp/actions/runs/38758805189) succeeded: **36/36 unit/integration tests**, including four actual PostgreSQL network scenarios, eleven browser scenarios, lint, typecheck, build, dependency audit and Linux release packaging. The network regression deliberately expires a checked-out idle transaction, verifies its advisory lock becomes available and confirms the pool still serves queries. Earlier, three network scenarios also passed against a throwaway database on the actual Azure PostgreSQL server; that database was removed.
+
+`cloud-verification.json` is the generated final public-URL acceptance record for the deployed source commit. It verifies database-backed health 200, anonymous access 401, staff login with Secure/HttpOnly/SameSite cookies, checksum-safe repeat import, all source totals, invalid/stale HMAC rejection, unknown test accounts, out-of-order backfill, five concurrent duplicate deliveries, conflicting payload rejection, shared-device revocation and test isolation from real analytics. It also verifies the 118-member dynamic segment, actual Azure aggregate/segment answers, identifying-question rejection and client logout. HTTP redirects to HTTPS with 301. A copied stateless session cookie remains valid until expiry/secret rotation, as documented in `SECURITY.md`.
+
+Actual final source totals: 2,900 canonical newsletter people, 13,925 raw rows, 10,000 website events, 8,441 resolved website links, 900 linked app accounts and 30 standalone app accounts. Test webhook traffic does not change these metrics. `cloud-import-verification.json` transcribes the first observed hosted import timings: app accounts 5.85 seconds and website events 5.43 seconds, including network time. These are individual observations, not load-test results. Safe actual model outputs are retained in `cloud-ai-aggregate.json` and `cloud-ai-segment.json`; no subscriber list was sent to the model.
+
+`cloud-browser-verification.json` records actual hosted desktop/mobile Playwright checks: chart rendering, seven feature routes returning 200, a real Azure answer and inspected aggregate, no horizontal mobile overflow, and working mobile navigation to Subscribers. Screenshots are `cloud-overview.png`, `cloud-assistant.png` and `cloud-overview-mobile.png`. The mobile capture waits for the navigation transition to finish. One final WAN sample measured overview at 1.07 seconds and segment preview at 0.47 seconds; this is not a concurrent-load benchmark.
 
 Docker execution is unverified because Docker is unavailable locally. The Loom recording is still planned. See `REFACTOR_REVIEW.md` and `VERIFICATION.md` for implementation evidence and remaining scope limits.

@@ -40,7 +40,15 @@ All eleven local browser scenarios passed after separating test output directori
 
 Azure cost approval was subsequently supplied: approximately US$30/month with removal after fourteen days. Dedicated B1 App Service and B1ms PostgreSQL resources were provisioned in West US 3, TLS connectivity and real PostgreSQL concurrency were verified, and schema migrations were applied separately from the non-owner application role. The current hosted acceptance state and cleanup inventory are recorded in [DEPLOYMENT.md](DEPLOYMENT.md). The historical table's "no deployment performed" describes the earlier syntax-only check, not the final resource state.
 
+After the cloud import/transaction findings, the final local suite passed 32 tests and explicitly skipped four network-only tests. The Linux CI summary for commit `b467b76` records **36/36 passing tests**, including the new actual PostgreSQL abandoned-transaction/lock-release/pool-recovery regression. The complete eleven-scenario browser suite, lint, typecheck, production build, dependency audit and release packaging also passed in that verification job. The local final production rebuild and 2,216-artifact secret scan passed; its server was restarted successfully. See [final source verification](https://github.com/Saurabhzz9/tpo-mini-cdp/actions/runs/38758805189).
+
 Exact commands, concrete fixes, visual limitations and failed intermediate executions are in [REFACTOR_REVIEW.md](REFACTOR_REVIEW.md).
+
+## Final hosted acceptance
+
+The final source's [CI and Azure delivery](https://github.com/Saurabhzz9/tpo-mini-cdp/actions/runs/38758805189) both succeeded. Actual public API acceptance is generated in `cloud-verification.json`, and actual desktop/mobile browser acceptance in `cloud-browser-verification.json`. These cover the complete supplied dataset reconciliation, secure login and anonymous protection, safe repeat import, signed/concurrent/late/shared-device webhook behavior with analytics isolation, real Azure aggregate and structured-segment answers, identifying-input rejection and browser logout. A client smoke test initially reused a saved stateless cookie after logout; its corrected client clears the cookie, as a browser does. Copied-cookie revocation remains an explicit authentication limitation.
+
+The current hosted screenshots are `cloud-overview.png`, `cloud-assistant.png` and `cloud-overview-mobile.png`. The mobile capture was repeated after waiting for the sidebar transition to finish, and actual mobile navigation was checked. Source totals remain 2,900 subscribers, 900 linked app accounts, 10,000 web events and 8,441 resolved website links. Import and single-request timing evidence is in the deployment runbook; no load-test or broad production-hardening claim is made.
 
 ## Remaining verification limits
 

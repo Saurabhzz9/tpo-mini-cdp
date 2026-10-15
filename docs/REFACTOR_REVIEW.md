@@ -1,6 +1,6 @@
 # Architecture refactor and quality review — October 15, 2026
 
-## Findings and implemented changes
+## A. Architecture findings and implemented changes
 
 | Finding | Evidence / consequence | Severity and change |
 |---|---|---|
@@ -22,7 +22,7 @@
 
 The source-backed baseline did not establish an authentication bypass, anonymous PII access, SQL injection, executable imported/model HTML, CSRF bypass, unchecked model execution or unrestricted model access to rows. Shared staff segment/profile access is the intended single-workspace policy, not per-owner tenancy. Those conclusions are bounded source review plus regression evidence, not a penetration-test certificate.
 
-## Responsibilities retained and moved
+## B. Responsibilities, state and CSS results
 
 | Original responsibility | Final owner |
 |---|---|
@@ -42,7 +42,13 @@ The source-backed baseline did not establish an authentication bypass, anonymous
 
 There are no arbitrary dozens of one-line presentation wrappers, no new state-management framework and no separate backend. The segment builder and saved audiences intentionally stay together because editing, presets, preview and saved state are coupled. Charts remain client-rendered; authenticated layout and safe settings projection run on the server. Shared primitives can render in either environment without importing database or model code.
 
-## Executed verification
+## C. Security findings
+
+Confirmed fixes cover the shared anonymous login denial, test/live identity collisions, concurrent first-account creation, phantom profiles from rejected account claims, and a cloud-observed idle transaction holding the global identity lock. Raw rows, established owners and authorized access remain intact. Regression tests cover the affected boundaries; the network suite also expires a transaction and checks subsequent lock acquisition and pool health.
+
+Remaining risks are environment-managed staff passwords without MFA or selective session revocation, inline-script CSP, shared application secret/role blast radius, unverified backup restoration and bounded but still whole-audience analytics. These are documented deployment/scope risks, not claims that an anonymous SQL/PII bypass was demonstrated. See `SECURITY.md` for exact controls, trusted-ingress assumptions and retry/throughput limits.
+
+## D. Executed verification
 
 | Command / check | Observed result |
 |---|---|
@@ -58,6 +64,8 @@ There are no arbitrary dozens of one-line presentation wrappers, no new state-ma
 | Client static artifact search for `pg_advisory_xact_lock`, `AZURE_AI_KEY`, `@electric-sql/pglite` | No matches |
 | `npm audit` | Zero reported vulnerabilities including development dependencies |
 | GitHub Actions run `38749444049`, commit `a444a7b` | Successful Linux CI: typecheck, lint, unit/network PostgreSQL tests, browser E2E, build, dependency audit and release packaging |
+| Final GitHub Actions run `38758805189`, commit `b467b76` | Verification and Azure deployment both succeeded; 36/36 unit/network tests, 11/11 browser scenarios, typecheck, lint, build, audit and release packaging |
+| Actual public API and browser acceptance | Passed on the final deployed source: source totals, safe repeat import, HMAC/concurrency/linking, real Azure aggregate/segment calls, secure login/client logout, desktop chart and mobile navigation/overflow. Generated records and screenshots are linked in DEPLOYMENT.md |
 
 One intermediate full browser run failed during trace cleanup because a parallel visual run used the same Playwright output directory. The application assertions were not the cause. Separate E2E, release and visual output directories were added; the subsequent complete eleven-scenario run passed. Initial cloud source build failed because production dependency installation omitted the TypeScript resolver; hosted delivery now uses the already verified Linux CI artifact with scoped OIDC authentication. Another initial cloud import was interrupted while deployment instances were still converging; final acceptance waits for stable deployment. Cloud acceptance details are in `DEPLOYMENT.md`.
 
@@ -67,10 +75,14 @@ Visual references intentionally stay in ignored `tmp/visual-baseline` because th
 
 No end-user latency or whole-application JavaScript-size improvement is inferred solely from splitting files. A sampled uncompressed login script total changed from 568,612 to 569,451 bytes; it is not a bundle-size win. The concrete improvements are route dependency separation, fewer redundant requests and SQL operations, cancellation correctness, bounded history reads and reduced duplicate-array copying. Segments still evaluate in server memory, and profile CTE aggregation is not a materialized/indexed per-person rollup system.
 
-## Assessment coverage and remaining work
+## E. Human and AI engineering responsibilities
+
+The human supplied requirements and architecture constraints, selected the repository and hosting budget/lifetime, requested corrections/refactoring, and reports active source/security review and manual browser/E2E review. The assistant generated the recorded implementation, tests and corrective patches and executed the logged automation. Human review/testing is retained as developer-reported where no independent execution record exists. No handwritten-code percentage, independent human test log or brief-authorship inference is invented. `DEVELOPMENT_PROCESS.md` records the evidence and division of responsibilities.
+
+## F. Assessment readiness and remaining work
 
 Full-data tests retain the supplied source totals, original JSON, invalid flags, duplicate lineage, safe reimports and canonical counts. Identity tests cover unknown users, conflicting visitors/devices and out-of-order anonymous backfill. Segment tests cover AND/OR, scope, current membership and formula-safe exports; app-only exports now include account IDs. HMAC tests cover invalid/stale/tampered signatures, persisted retry behavior, conflicting duplicates and concurrent delivery. Captured model transports cover PII/raw-question removal, poisoned source labels, identifying input, suppressed aggregates and rejected unexpected model tools/definitions. Browser tests exercise authorization, login/logout, real charts, search/profile/duplicates, segments, lab, quality, assistant unavailable/privacy states and mobile tasks. Actual Azure model calls are separate release/cloud smoke checks.
 
-The application is ready for code-level technical review with the documented scope limits. Organizational rollout still needs SSO/MFA/session revocation, stronger CSP, a backup restore drill and measured scale/load work. Dark mode, report bookmarks and arbitrarily nested segment groups are not implemented. The Loom recording is planned, not recorded. The original raw audit remains unchanged; the new nine-question response is a separate unedited artifact. Human and AI responsibilities are documented in `DEVELOPMENT_PROCESS.md`.
+The application is ready for technical assessment review and the verified hosted demo, ending October 29 at 12:00 IST. Organizational rollout still needs SSO/MFA/session revocation, stronger CSP, a backup restore drill and measured scale/load work. Dark mode, report bookmarks and arbitrarily nested segment groups are not implemented. The Loom recording is planned, not recorded. Docker execution is unverified. The original raw audit remains unchanged; the new nine-question response is a separate unedited artifact. Human and AI responsibilities are documented in `DEVELOPMENT_PROCESS.md`.
 
 The independent security baseline completed, and the parent validated/fixed its concrete login finding. The plugin's canonical scan/report completion was blocked when its tools were removed from the session; scan `d5e319b2-2663-4593-aa47-7ca4df411016` retains its checkpoint. This document reports implementation and test evidence, not a fabricated completed Codex Security report.

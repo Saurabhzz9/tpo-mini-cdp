@@ -4,7 +4,9 @@ A working mini customer data platform for the Growth team: preserved CSV source 
 
 Assessment demo: Azure hosting is limited to **14 days, ending October 29, 2026**. The approved target is approximately **US$30/month**; the selected fixed hosting estimate is US$28.50/month before light inference, network usage and taxes. The dedicated demo resources are scheduled for removal on October 29 at 12:00 IST. See [deployment and cleanup](docs/DEPLOYMENT.md) for live acceptance status, exact inventory and cost limits.
 
-![The actual Reader Intelligence dashboard](docs/overview.png)
+**Live demo: [Reader Intelligence](https://tpo-cdp-s9-261015.azurewebsites.net).** The generated staff login is in the local ignored `.cloud-access.txt` file. The hosted URL will become unavailable when the demo resources are removed.
+
+![The actual hosted Reader Intelligence dashboard](docs/cloud-overview.png)
 
 ## Run locally
 
@@ -92,8 +94,8 @@ Tests load the supplied datasets into isolated PostgreSQL engines. Browser tests
 
 ## Hosting and submission
 
-Azure App Service + PostgreSQL Flexible Server configuration is in `infra/main.bicep`, with an unprivileged optional Docker runtime. [Deployment instructions](docs/DEPLOYMENT.md) cover migration, secrets, IP allowlisting, packaging and verification. Creating billable Azure services requires explicit cost approval; no public hosted URL is claimed until deployed and checked. Linux must build the hosted release bundle; Windows standalone junctions are not portable.
+Azure App Service + PostgreSQL Flexible Server configuration is in `infra/main.bicep`, with an unprivileged optional Docker runtime. The approved Azure demo is deployed and verified. [Deployment instructions](docs/DEPLOYMENT.md) cover actual cloud acceptance, cost, migration, secrets, IP allowlisting, scoped GitHub OIDC delivery and automatic removal. Linux CI builds the hosted release bundle; Windows standalone junctions are not portable. No manual Linux ZIP download is required.
 
 [Architecture decisions](docs/ARCHITECTURE.md), [security and privacy](docs/SECURITY.md), [data dictionary](docs/DATA_DICTIONARY.md), [raw self-audit](docs/SELF_AUDIT.md), and [Loom recording plan](docs/LOOM_PLAN.md) document the submission. The recording itself still needs to be made.
 
-Known limits: fixed safe AI intents rather than unrestricted natural-language SQL; snapshot data cannot measure historical open transitions or true retention; shared devices are deliberately under-linked; staff authentication has no MFA/per-session revocation; production PostgreSQL and Azure hosting require separate deployment verification. There are no fabricated app events or inferred newsletter-open timelines in the initial dataset.
+Known limits: fixed safe AI intents rather than unrestricted natural-language SQL; snapshot data cannot measure historical open transitions or true retention; shared devices are deliberately under-linked; staff authentication has no MFA/per-session revocation; backup restoration and Docker execution remain unverified. There are no fabricated app events or inferred newsletter-open timelines in the initial dataset. [Final A–F review](docs/REFACTOR_REVIEW.md) and the [new unedited nine-question audit](docs/SELF_AUDIT_REFACTOR.md) record findings, evidence and responsibilities.

@@ -1,0 +1,19 @@
+{
+  "recordedAt": "2026-10-15T15:31:21.155Z",
+  "sourceCommit": "b467b76e4570fef61c12f4d307b39b523997ccc8",
+  "prompt": {
+    "path": "self-audit-prompt.txt",
+    "sha256": "8718DD2BA96FE187A7F256FF8692057BB2670E17BBE6E88069843D533B25DCCB"
+  },
+  "originalResponse": {
+    "path": "SELF_AUDIT.md",
+    "sha256": "D783A20E47C8688805BFDADE50F842245BFF8C023F8AC10B929124D2C3CB3D8A",
+    "unchanged": true
+  },
+  "newResponse": {
+    "path": "SELF_AUDIT_REFACTOR.md",
+    "sha256": "819D080389517FDDEA996EA70CCB7484C2401181173497A4674D930AE9771F4F",
+    "preservedAsFirstWritten": true
+  },
+  "authorship": "Implementing assistant self-assessment; not an independent audit"
+}

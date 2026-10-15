@@ -1,0 +1,39 @@
+{
+  "verifiedAt": "2026-10-15T15:24:27.812Z",
+  "origin": "https://tpo-cdp-s9-261015.azurewebsites.net",
+  "pages": [
+    {
+      "route": "subscribers",
+      "status": 200
+    },
+    {
+      "route": "segments",
+      "status": 200
+    },
+    {
+      "route": "activity",
+      "status": 200
+    },
+    {
+      "route": "insights",
+      "status": 200
+    },
+    {
+      "route": "quality",
+      "status": 200
+    },
+    {
+      "route": "lab",
+      "status": 200
+    },
+    {
+      "route": "settings",
+      "status": 200
+    }
+  ],
+  "desktopChart": true,
+  "actualAzureAnswer": true,
+  "aggregateInspected": true,
+  "mobileOverflow": false,
+  "mobileNavigation": true
+}

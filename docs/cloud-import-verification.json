@@ -1,0 +1,13 @@
+{
+  "verifiedOn": "2026-10-15",
+  "recordedFrom": "Actual cloud smoke-test console output, transcribed by the implementing assistant",
+  "origin": "https://tpo-cdp-s9-261015.azurewebsites.net",
+  "commit": "bb49f00ae962a2e352a56116c1e72efcfe89474f",
+  "imports": [
+    {"kind":"subscribers","status":200,"milliseconds":1289,"repeated":true},
+    {"kind":"app_users","status":200,"milliseconds":5854,"repeated":false},
+    {"kind":"web_events","status":200,"milliseconds":5428,"repeated":false}
+  ],
+  "reconciled": {"subscribers":2900,"rawRows":13925,"webEvents":10000,"linkedWebEvents":8441,"appLinked":900},
+  "note": "Single observed imports, including network time; this is not a load test. The earlier subscriber import before batching took 56256 ms. Its later checksum no-op is not a like-for-like performance comparison. Full acceptance continued through HMAC/AI checks but its initial logout assertion incorrectly replayed a saved stateless cookie; the corrected client clears that cookie as a browser does."
+}
