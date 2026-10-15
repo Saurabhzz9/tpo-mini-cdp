@@ -17,6 +17,7 @@ import {
   askAssistant,
 } from "../src/lib/assistant";
 import { analysisDate, daysSince } from "../src/lib/config";
+import { loginClientKey, rateLimit } from "../src/lib/auth";
 beforeAll(async () => {
   process.env.PGLITE_PATH = "memory://";
   process.env.ANALYSIS_DATE = "2026-09-28";
@@ -25,6 +26,43 @@ beforeAll(async () => {
 });
 afterAll(async () => {
   await closeDb();
+});
+describe("isolated authentication abuse controls", () => {
+  it("ignores spoofed forwarded addresses outside the explicitly trusted ingress", () => {
+    vi.stubEnv("LOGIN_TRUSTED_PROXY", "");
+    expect(
+      loginClientKey(
+        new Request("http://localhost", {
+          headers: { "x-forwarded-for": "203.0.113.9" },
+        }),
+      ),
+    ).toBe("local-direct");
+    vi.unstubAllEnvs();
+  });
+  it("uses the proxy-appended address and isolates another client's login allowance", async () => {
+    vi.stubEnv("LOGIN_TRUSTED_PROXY", "azure-app-service");
+    vi.stubEnv("WEBSITE_INSTANCE_ID", "isolated-test-instance");
+    const client = (address: string) =>
+      loginClientKey(
+        new Request("https://test.invalid", {
+          headers: { "x-forwarded-for": address },
+        }),
+      );
+    expect(client("1.1.1.1, 203.0.113.10:5678")).toBe(
+      client("8.8.8.8, 203.0.113.10:5678"),
+    );
+    const blocked = client("203.0.113.10:5678"),
+      other = client("203.0.113.11:1234");
+    await rateLimit(`regression:${blocked}`, 1, 900);
+    await expect(
+      rateLimit(`regression:${blocked}`, 1, 900),
+    ).rejects.toMatchObject({ status: 429 });
+    await expect(
+      rateLimit(`regression:${other}`, 1, 900),
+    ).resolves.toBeUndefined();
+    expect(() => client("forged")).toThrow("Login ingress");
+    vi.unstubAllEnvs();
+  });
 });
 describe("normalization and time", () => {
   it("uses one trim/lowercase function without provider rewriting", () => {
@@ -344,6 +382,24 @@ describe("durable webhook processing", () => {
     await expect(
       ingestEvent({ ...event("unknown_property"), extra: "bad" }),
     ).rejects.toThrow();
+  });
+  it("rejects live/test identity collisions before any writes", async () => {
+    await expect(
+      ingestEvent(
+        event("live_namespace_collision", { user_id: "test_new_identity" }),
+      ),
+    ).rejects.toMatchObject({ status: 400 });
+    await expect(
+      ingestEvent(event("live_device_collision", { device_id: "test_device" })),
+    ).rejects.toMatchObject({ status: 400 });
+    await expect(
+      ingestEvent(event("test_wrong_namespace"), true),
+    ).rejects.toMatchObject({ status: 400 });
+    expect(
+      await query(
+        "SELECT event_id FROM app_events WHERE event_id='live_namespace_collision'",
+      ),
+    ).toHaveLength(0);
   });
 });
 describe("PII boundary and aggregate-only Azure transport", () => {

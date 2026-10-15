@@ -4,6 +4,9 @@ param location string = resourceGroup().location
 param databaseAdmin string = 'tpoadmin'
 @secure()
 param databasePassword string
+param applicationDatabaseUser string = databaseAdmin
+@secure()
+param applicationDatabasePassword string = ''
 @secure()
 param sessionSecret string
 @secure()
@@ -17,6 +20,8 @@ param azureAiKey string
 @description('Explicit trusted IPv4 addresses only. Add App Service outbound IPs after deployment.')
 param allowedDatabaseIps array = []
 param expiresOn string = '2026-10-29'
+@description('Build a source ZIP with Oryx on Linux, or deploy a prebuilt standalone ZIP.')
+param sourceBuild bool = false
 var demoTags = {project:'tpo-mini-cdp',expiresOn:expiresOn,monthlyBudgetUSD:'30',purpose:'14-day-assessment-demo'}
 
 resource plan 'Microsoft.Web/serverfarms@2023-12-01' = {
@@ -67,23 +72,26 @@ resource site 'Microsoft.Web/sites@2023-12-01' = {
       ftpsState:'Disabled'
       alwaysOn:true
       healthCheckPath:'/api/health'
-      appCommandLine:'node scripts/migrate-prod.mjs && node server.js'
+      appCommandLine:sourceBuild ? 'node scripts/start.mjs' : 'node server.js'
       appSettings:[
         {name:'NODE_ENV',value:'production'}
         {name:'PORT',value:'8080'}
         {name:'HOSTNAME',value:'0.0.0.0'}
         {name:'APP_URL',value:'https://${appName}.azurewebsites.net'}
-        {name:'DATABASE_URL',value:'postgresql://${databaseAdmin}:${uriComponent(databasePassword)}@${postgres.properties.fullyQualifiedDomainName}:5432/tpo?sslmode=verify-full'}
+        {name:'DATABASE_URL',value:'postgresql://${applicationDatabaseUser}:${uriComponent(empty(applicationDatabasePassword) ? databasePassword : applicationDatabasePassword)}@${postgres.properties.fullyQualifiedDomainName}:5432/tpo?sslmode=verify-full'}
         {name:'SESSION_SECRET',value:sessionSecret}
         {name:'WEBHOOK_SECRET',value:webhookSecret}
         {name:'ADMIN_USERNAME',value:'admin'}
+        {name:'LOGIN_TRUSTED_PROXY',value:'azure-app-service'}
         {name:'ADMIN_PASSWORD_HASH',value:adminPasswordHash}
         {name:'ANALYSIS_DATE',value:'2026-09-28'}
         {name:'ASSISTANT_DAILY_LIMIT',value:'10'}
         {name:'AZURE_AI_ENDPOINT',value:azureAiEndpoint}
         {name:'AZURE_AI_DEPLOYMENT',value:azureAiDeployment}
         {name:'AZURE_AI_KEY',value:azureAiKey}
-        {name:'SCM_DO_BUILD_DURING_DEPLOYMENT',value:'false'}
+        {name:'SCM_DO_BUILD_DURING_DEPLOYMENT',value:sourceBuild ? 'true' : 'false'}
+        {name:'ENABLE_ORYX_BUILD',value:sourceBuild ? 'true' : 'false'}
+        {name:'NPM_CONFIG_INCLUDE',value:sourceBuild ? 'dev' : ''}
       ]
     }
   }

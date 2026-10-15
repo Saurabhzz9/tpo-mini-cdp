@@ -1,10 +1,10 @@
+import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { getPeople, overview } from "./audience";
-import { sources, pages } from "./config";
+import { HttpError } from "./auth";
+import { pages, sources } from "./config";
 import { query } from "./db";
 import { matches, segmentSchema } from "./segments";
-import { randomUUID } from "node:crypto";
-import { HttpError } from "./auth";
 export const toolArgs = z
   .object({
     metric: z.enum([

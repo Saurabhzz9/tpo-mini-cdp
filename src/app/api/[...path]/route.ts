@@ -1,21 +1,23 @@
-import { NextResponse } from "next/server";
+import { workspaceSettings } from "@/lib/workspace-settings";
+import { askAssistant } from "@/lib/assistant";
+import { getPeople, overview, profile } from "@/lib/audience";
 import {
   authorized,
+  HttpError,
+  rateLimit,
+  loginClientKey,
+  readBody,
+  sameOrigin,
   session,
   verifyPassword,
-  rateLimit,
-  sameOrigin,
-  readBody,
-  HttpError,
 } from "@/lib/auth";
 import { query } from "@/lib/db";
-import { getPeople, overview, profile } from "@/lib/audience";
-import { segmentSchema, segmentMembers, exportPeople } from "@/lib/segments";
 import { importCSV } from "@/lib/importer";
-import { askAssistant } from "@/lib/assistant";
+import { exportPeople, segmentMembers, segmentSchema } from "@/lib/segments";
 import { eventSchema, sign } from "@/lib/webhook";
-import { z } from "zod";
+import { NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
+import { z } from "zod";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 async function handler(
@@ -29,13 +31,13 @@ async function handler(
       write = req.method !== "GET";
     if (write) sameOrigin(req);
     if (path === "auth/login" && req.method === "POST") {
-      await rateLimit("login-global", 30, 900);
       const { username, password } = z
         .object({
           username: z.string().max(100),
           password: z.string().max(200),
         })
         .parse(JSON.parse(await readBody(req)));
+      await rateLimit(`login-client:${loginClientKey(req)}`, 30, 900);
       const admin = username === (process.env.ADMIN_USERNAME || "admin"),
         analyst = username === (process.env.ANALYST_USERNAME || "analyst");
       const hash = admin
@@ -60,6 +62,12 @@ async function handler(
     }
     if (path === "overview" && !write)
       return NextResponse.json(await overview());
+    if (path === "import-history" && !write)
+      return NextResponse.json(
+        await query(
+          "SELECT kind,row_count,created_at::text,filename FROM import_batches ORDER BY created_at DESC LIMIT 100",
+        ),
+      );
     if (path === "people" && !write) {
       let people = await getPeople();
       const q = (url.searchParams.get("q") || "").slice(0, 200).toLowerCase(),
@@ -259,20 +267,7 @@ async function handler(
       });
     }
     if (path === "settings" && !write)
-      return NextResponse.json({
-        username: s.username,
-        role: s.role,
-        analysisDate: process.env.ANALYSIS_DATE || "2026-09-28",
-        database: process.env.DATABASE_URL
-          ? "PostgreSQL"
-          : "Local PostgreSQL (PGlite)",
-        aiConfigured: !!(
-          process.env.AZURE_AI_ENDPOINT &&
-          process.env.AZURE_AI_DEPLOYMENT &&
-          process.env.AZURE_AI_KEY
-        ),
-        deployment: process.env.AZURE_AI_DEPLOYMENT || null,
-      });
+      return NextResponse.json(workspaceSettings(s));
     throw new HttpError(404, "Endpoint not found");
   } catch (e) {
     if (e instanceof HttpError)

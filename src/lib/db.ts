@@ -1,7 +1,7 @@
 import { PGlite } from "@electric-sql/pglite";
-import { Pool } from "pg";
 import { mkdir } from "node:fs/promises";
 import { dirname } from "node:path";
+import { Pool } from "pg";
 export interface SQL {
   query<T = Record<string, unknown>>(
     sql: string,

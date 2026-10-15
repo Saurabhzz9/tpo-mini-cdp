@@ -1,7 +1,7 @@
-import { createHmac, timingSafeEqual, createHash } from "node:crypto";
+import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
-import { getDb } from "./db";
 import { HttpError } from "./auth";
+import { getDb } from "./db";
 const identifier = z
   .string()
   .min(1)
@@ -65,6 +65,15 @@ export function verifySignature(
 }
 export async function ingestEvent(input: unknown, test = false) {
   const e = eventSchema.parse(input);
+  if (
+    test !== e.event_id.startsWith("test_") ||
+    test !== e.device_id.startsWith("test_") ||
+    (e.user_id !== null && test !== e.user_id.startsWith("test_"))
+  )
+    throw new HttpError(
+      400,
+      "Test and live event identifiers must use separate namespaces",
+    );
   const canonical = JSON.stringify({
     ...e,
     properties: Object.fromEntries(
@@ -75,7 +84,7 @@ export async function ingestEvent(input: unknown, test = false) {
   const hash = createHash("sha256").update(canonical).digest("hex");
   return (await getDb()).transaction(async (tx) => {
     // Serialize both event-id and device changes across all app instances.
-    await tx.query("SELECT pg_advisory_xact_lock(481511)");
+    await tx.query("SELECT pg_advisory_xact_lock(481510)");
     const existing = (
       await tx.query<{ payload_hash: string }>(
         "SELECT payload_hash FROM app_events WHERE event_id=$1",

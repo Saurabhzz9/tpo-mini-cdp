@@ -304,3 +304,46 @@ test("overview meets WCAG A/AA automated accessibility checks", async ({
     })),
   ).toEqual([]);
 });
+
+test("delayed search responses cannot replace a newer query and shell settings stay server-rendered", async ({
+  page,
+}) => {
+  await login(page);
+  let settingsRequests = 0;
+  page.on("request", (request) => {
+    if (new URL(request.url()).pathname === "/api/settings") settingsRequests++;
+  });
+  let releaseOld!: () => void;
+  const oldGate = new Promise<void>((resolve) => {
+    releaseOld = resolve;
+  });
+  let oldStarted!: () => void;
+  const started = new Promise<void>((resolve) => {
+    oldStarted = resolve;
+  });
+  await page.route("**/api/people?**", async (route) => {
+    const q = new URL(route.request().url()).searchParams.get("q");
+    if (q === "slow-old-query") {
+      oldStarted();
+      await oldGate;
+      await route
+        .fulfill({ json: { people: [], total: 999, page: 1 } })
+        .catch(() => {});
+    } else await route.continue();
+  });
+  await page.getByRole("link", { name: "Subscribers", exact: true }).click();
+  await page.getByLabel("Search readers").fill("slow-old-query");
+  await started;
+  await page.getByLabel("Search readers").fill("Instagram");
+  await expect(page.getByText("899 profiles")).toBeVisible();
+  releaseOld();
+  await expect(page.getByText("899 profiles")).toBeVisible();
+  await expect(page.getByText("999 profiles")).toHaveCount(0);
+  await page
+    .getByRole("link", { name: "Growth insights", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Signup cohorts" }),
+  ).toBeVisible();
+  expect(settingsRequests).toBe(0);
+});

@@ -1,8 +1,8 @@
-import Workspace from "@/components/workspace";
+import ProfileScreen from "@/components/subscribers/subscriber-profile";
 export default async function Profile({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  return <Workspace view="profile" profileId={(await params).id} />;
+  return <ProfileScreen id={(await params).id} />;
 }

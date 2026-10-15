@@ -13,6 +13,7 @@ CREATE INDEX IF NOT EXISTS web_visitor_idx ON web_events(visitor_id);
 CREATE TABLE IF NOT EXISTS app_events(event_id text PRIMARY KEY, event text NOT NULL CHECK(event IN ('app_open','read_story','link_click','login')), user_id text REFERENCES app_users(user_id), resolved_user_id text REFERENCES app_users(user_id), device_id text NOT NULL, timestamp timestamptz NOT NULL, ingested_at timestamptz NOT NULL DEFAULT now(), properties jsonb NOT NULL, payload_hash text NOT NULL, test boolean NOT NULL DEFAULT false);
 CREATE INDEX IF NOT EXISTS app_device_time_idx ON app_events(device_id,timestamp);
 CREATE INDEX IF NOT EXISTS app_resolved_idx ON app_events(resolved_user_id,timestamp);
+CREATE INDEX IF NOT EXISTS app_ingested_idx ON app_events(ingested_at DESC);
 CREATE TABLE IF NOT EXISTS segments(id text PRIMARY KEY, name text NOT NULL, definition jsonb NOT NULL, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now());
 CREATE TABLE IF NOT EXISTS audit_log(id bigserial PRIMARY KEY, action text NOT NULL, actor text NOT NULL, detail jsonb NOT NULL DEFAULT '{}', created_at timestamptz NOT NULL DEFAULT now());
 CREATE TABLE IF NOT EXISTS rate_limits(key text PRIMARY KEY, window_at timestamptz NOT NULL DEFAULT now(), hits integer NOT NULL DEFAULT 1);

@@ -1,12 +1,14 @@
 "use client";
-import { useState, useEffect } from "react";
+import styles from "./login.module.css";
+import { css } from "@/lib/css";
 import {
   ArrowRight,
-  ShieldCheck,
   Coffee,
   Layers3,
+  ShieldCheck,
   Waypoints,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 export default function Login() {
   const [ready, setReady] = useState(false);
   useEffect(() => setReady(true), []);
@@ -32,16 +34,16 @@ export default function Login() {
     }
   }
   return (
-    <div className="login-layout">
-      <section className="login-story">
-        <div className="wordmark">
+    <div className={css(styles, "login-layout")}>
+      <section className={css(styles, "login-story")}>
+        <div className={css(styles, "wordmark")}>
           <Coffee size={34} />
           <span>
-            the pour over<span className="wordmark-dot">.</span>
+            the pour over<span className={css(styles, "wordmark-dot")}>.</span>
           </span>
         </div>
         <div>
-          <span className="eyebrow">READER INTELLIGENCE</span>
+          <span className={css(styles, "eyebrow")}>READER INTELLIGENCE</span>
           <h1>
             Know your readers.
             <br />
@@ -54,7 +56,7 @@ export default function Login() {
             <br />
             website, and app.
           </p>
-          <div className="login-chips">
+          <div className={css(styles, "login-chips")}>
             <span>
               <Layers3 size={16} /> Unified profiles
             </span>
@@ -65,11 +67,11 @@ export default function Login() {
         </div>
         <small>Good news. Better understanding.</small>
       </section>
-      <section className="login-form">
-        <div className="login-form-inner">
-          <span className="eyebrow">THE GROWTH WORKSPACE</span>
+      <section className={css(styles, "login-form")}>
+        <div className={css(styles, "login-form-inner")}>
+          <span className={css(styles, "eyebrow")}>THE GROWTH WORKSPACE</span>
           <h2>A fresh perspective.</h2>
-          <p className="muted">
+          <p className={css(styles, "muted")}>
             Sign in to your Reader Intelligence workspace.
           </p>
           <form method="post" action="/api/auth/login" onSubmit={submit}>
@@ -94,19 +96,22 @@ export default function Login() {
               />
             </label>
             {error && (
-              <div className="notice error" role="alert">
+              <div className={css(styles, "notice error")} role="alert">
                 {error}
               </div>
             )}
-            <button className="button primary full" disabled={busy || !ready}>
+            <button
+              className={css(styles, "button primary full")}
+              disabled={busy || !ready}
+            >
               {busy ? "Signing in…" : "Enter workspace"}
               <ArrowRight size={17} />
             </button>
           </form>
-          <div className="login-security">
+          <div className={css(styles, "login-security")}>
             <ShieldCheck size={17} /> Private workspace · Access by invitation
           </div>
-          <p className="login-help">
+          <p className={css(styles, "login-help")}>
             Local setup? Your generated credentials are in{" "}
             <code>.local-access.txt</code>.
           </p>

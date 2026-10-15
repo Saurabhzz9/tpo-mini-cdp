@@ -1,6 +1,7 @@
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
-import { scryptSync, timingSafeEqual, createHash } from "node:crypto";
+import { createHash, scryptSync, timingSafeEqual } from "node:crypto";
+import { isIP } from "node:net";
 import { query } from "./db";
 export type Session = {
   username?: string;
@@ -43,7 +44,7 @@ export class HttpError extends Error {
 }
 export function verifyPassword(password: string, hash: string) {
   const [salt, expected] = hash.split(":");
-  if (!salt || !expected || expected.length !== 128) return false;
+  if (!salt || !expected || !/^[a-f0-9]{128}$/i.test(expected)) return false;
   const actual = scryptSync(password, salt, 64);
   return timingSafeEqual(actual, Buffer.from(expected, "hex"));
 }
@@ -62,6 +63,30 @@ export async function rateLimit(key: string, max: number, seconds = 60) {
   );
   if (rows[0].hits > max)
     throw new HttpError(429, "Too many requests. Try again later.");
+}
+/** Trust only the last address appended by the configured App Service ingress.
+ * A direct Node host must leave this mode disabled; arbitrary forwarded headers
+ * must never become identity. The reverse proxy must be the sole public ingress.
+ */
+export function loginClientKey(request: Request) {
+  if (
+    process.env.LOGIN_TRUSTED_PROXY !== "azure-app-service" ||
+    !process.env.WEBSITE_INSTANCE_ID
+  )
+    return "local-direct";
+  const forwarded = request.headers
+    .get("x-forwarded-for")
+    ?.split(",")
+    .at(-1)
+    ?.trim();
+  const address = forwarded?.startsWith("[")
+    ? forwarded.match(/^\[([^\]]+)\](?::\d+)?$/)?.[1]
+    : forwarded && isIP(forwarded)
+      ? forwarded
+      : forwarded?.replace(/:\d+$/, "");
+  if (!address || !isIP(address))
+    throw new HttpError(503, "Login ingress is not configured correctly");
+  return createHash("sha256").update(address).digest("hex");
 }
 export async function readBody(request: Request, limit = 32768) {
   if (Number(request.headers.get("content-length")) > limit)

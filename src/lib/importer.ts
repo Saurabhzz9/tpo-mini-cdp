@@ -182,7 +182,11 @@ export async function importCSV(
       for (const row of raw) {
         const r = row.original,
           email = normalizeEmail(r.email);
-        if (!r.user_id || !date(r.created_at)) {
+        if (
+          !r.user_id ||
+          !date(r.created_at) ||
+          r.user_id.startsWith("test_")
+        ) {
           row.flags.push("invalid_app_record");
           continue;
         }

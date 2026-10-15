@@ -1,0 +1,86 @@
+.page-ranking {
+  padding: 0 24px 20px;
+}
+.page-ranking > div {
+  display: flex;
+  align-items: center;
+  position: relative;
+  gap: 11px;
+  padding: 15px 0 11px;
+  margin-bottom: 5px;
+  font-size: 10px;
+}
+.page-ranking span {
+  color: var(--metadata);
+  font-size: 9px;
+}
+.page-ranking strong {
+  font-weight: 400;
+  color: var(--metadata);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.page-ranking b {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--metadata);
+}
+.page-ranking > div > div {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  background: #e5ecda;
+  max-width: 100%;
+}
+.journey-card {
+  padding: 23px;
+}
+.journey-card > p {
+  font-size: 10px;
+  line-height: 1.7;
+  margin-top: 8px;
+}
+.journey-stage {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 24px;
+}
+.journey-stage > span {
+  display: grid;
+  place-items: center;
+  border: 1px solid #e9efdc;
+  background: #f4f8ed;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  color: var(--metadata);
+  font-size: 9px;
+}
+.journey-stage > div {
+  flex: 1;
+}
+.journey-stage strong {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--metadata);
+}
+.journey-stage i {
+  display: block;
+  height: 4px;
+  background: #d4dfc3;
+  margin-top: 8px;
+  border-radius: 4px;
+}
+.journey-stage b {
+  font-size: 17px;
+  font-family: var(--serif);
+  font-weight: 400;
+  color: var(--metadata);
+}
+.cohort-chart {
+  height: 210px;
+  margin-bottom: 12px;
+}

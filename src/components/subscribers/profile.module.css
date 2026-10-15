@@ -1,0 +1,138 @@
+.back-link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--metadata);
+  margin-bottom: 19px;
+}
+.profile-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 20px;
+  margin-bottom: 22px;
+}
+.profile-grid > div > :global(.card) + :global(.card) {
+  margin-top: 20px;
+}
+.identity-root {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 0 24px 5px;
+  padding: 15px;
+  background: #f3f5eb;
+  border-radius: 7px;
+  color: var(--metadata);
+}
+.identity-root span {
+  font-size: 11px;
+}
+.identity-root small {
+  display: block;
+  font-size: 9px;
+  color: var(--metadata);
+  margin-top: 5px;
+  word-break: break-all;
+}
+.identity-branches {
+  margin: 0 24px 24px 45px;
+  padding-left: 20px;
+  border-left: 1px solid #e4e8d9;
+}
+.identity-branches > div {
+  position: relative;
+  padding: 18px 0 0;
+  display: flex;
+  gap: 10px;
+  font-size: 10px;
+  color: var(--metadata);
+}
+.identity-branches > div:before {
+  content: "";
+  width: 19px;
+  height: 1px;
+  background: #e4e8d9;
+  position: absolute;
+  left: -20px;
+  top: 26px;
+}
+.identity-branches small {
+  display: block;
+  font-size: 9px;
+  color: var(--metadata);
+  margin-top: 5px;
+}
+.timeline-card {
+  max-height: 850px;
+  overflow-y: auto;
+}
+.timeline {
+  padding: 6px 24px 22px;
+}
+.timeline-entry {
+  display: flex;
+  gap: 14px;
+  position: relative;
+  padding-bottom: 25px;
+}
+.timeline-entry:before {
+  content: "";
+  position: absolute;
+  width: 1px;
+  background: #e8edde;
+  top: 28px;
+  bottom: 0;
+  left: 14px;
+}
+.timeline-entry:last-child:before {
+  display: none;
+}
+.timeline-node {
+  position: relative;
+  z-index: 1;
+  width: 29px;
+  height: 29px;
+  display: grid;
+  place-items: center;
+  background: #f1f4e9;
+  color: var(--metadata);
+  border-radius: 50%;
+  border: 1px solid #e7ecdf;
+  flex-shrink: 0;
+}
+.timeline-entry small {
+  font-size: 9px;
+  color: var(--metadata);
+}
+.timeline-entry strong {
+  font-size: 11px;
+  font-weight: 500;
+  display: block;
+  margin-top: 6px;
+  overflow-wrap: anywhere;
+}
+.timeline-entry p {
+  color: var(--metadata);
+  font-size: 9px;
+  margin-top: 6px;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 1200px) {
+  .profile-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 1000px) {
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+  .timeline-card {
+    max-height: 700px;
+  }
+}
+@media (max-width: 760px) {
+  .profile-grid {
+    gap: 18px;
+  }
+}

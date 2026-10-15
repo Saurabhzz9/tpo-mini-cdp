@@ -1,0 +1,16 @@
+export const fields = [
+  "source",
+  "status",
+  "signup_date",
+  "days_inactive",
+  "never_opened",
+  "web_visits",
+  "web_page",
+  "utm_source",
+  "app_accounts",
+  "app_event",
+  "story_reads",
+  "score",
+  "last_activity_days",
+  "data_complete",
+] as const;

@@ -12,7 +12,8 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "typecheck": "next typegen && tsc --noEmit",
-    "webhook:send": "tsx scripts/send-webhook.ts"
+    "webhook:send": "tsx scripts/send-webhook.ts",
+    "lint": "eslint src tests scripts *.ts"
   },
   "dependencies": {
     "@electric-sql/pglite": "0.5.10",
@@ -35,9 +36,12 @@
     "@types/pg": "^8.16.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "eslint": "^10.12.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
     "prettier": "^3.9.10",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
+    "typescript-eslint": "^8.71.2",
     "vitest": "4.1.11"
   },
   "type": "module"

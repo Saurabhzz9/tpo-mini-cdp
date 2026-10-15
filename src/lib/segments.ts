@@ -1,22 +1,8 @@
 import { z } from "zod";
 import type { Person } from "./audience";
 import { daysSince } from "./config";
-export const fields = [
-  "source",
-  "status",
-  "signup_date",
-  "days_inactive",
-  "never_opened",
-  "web_visits",
-  "web_page",
-  "utm_source",
-  "app_accounts",
-  "app_event",
-  "story_reads",
-  "score",
-  "last_activity_days",
-  "data_complete",
-] as const;
+import { fields } from "./segment-fields";
+export { fields } from "./segment-fields";
 export const ruleSchema = z
   .object({
     field: z.enum(fields),
@@ -130,7 +116,7 @@ export const csvCell = (value: unknown) => {
 };
 export function exportPeople(people: Person[]) {
   return (
-    "\ufeffemail,status,source,signup_date,score,web_visits,app_events\r\n" +
+    "\ufeffemail,status,source,signup_date,score,web_visits,app_events,app_user_ids\r\n" +
     people
       .map((p) =>
         [
@@ -141,6 +127,7 @@ export function exportPeople(people: Person[]) {
           p.score,
           p.web_visits,
           p.app_events,
+          p.app_ids.join(";"),
         ]
           .map(csvCell)
           .join(","),

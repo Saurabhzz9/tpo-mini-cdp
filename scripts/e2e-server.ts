@@ -1,6 +1,6 @@
 import { scryptSync } from "node:crypto";
 import { spawn } from "node:child_process";
-import { getDb, closeDb } from "../src/lib/db";
+import { closeDb } from "../src/lib/db";
 import { migrate } from "./migrate";
 import { importCSV } from "../src/lib/importer";
 import { readFile } from "node:fs/promises";

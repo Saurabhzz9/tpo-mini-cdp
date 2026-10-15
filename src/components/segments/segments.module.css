@@ -1,0 +1,232 @@
+.preset-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+}
+.preset {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--border);
+  background: #fdfefa;
+  padding: 11px 14px;
+  border-radius: 6px;
+  color: var(--metadata);
+  font-size: 10px;
+}
+.preset:hover {
+  background: #edf2e4;
+}
+.segment-name {
+  max-width: 390px;
+  margin: 3px 24px 24px;
+  color: var(--metadata);
+}
+.segment-name input {
+  font-size: 12px;
+}
+.match-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 11px;
+  align-items: center;
+  padding: 0 24px 19px;
+  font-size: 11px;
+  color: var(--metadata);
+}
+.match-row select {
+  font-size: 10px;
+  padding: 7px;
+}
+.rules {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0 24px;
+}
+.rule-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  background: #f8faf4;
+  padding: 12px;
+  border: 1px solid #edf0e5;
+  border-radius: 6px;
+}
+.rule-index {
+  font-size: 8px;
+  color: var(--metadata);
+  min-width: 28px;
+}
+.rule-row select {
+  flex: 1;
+  min-width: 0;
+  font-size: 10px;
+  padding: 9px;
+}
+.rule-row input {
+  flex: 1;
+  min-width: 50px;
+  width: 100px;
+  font-size: 11px;
+  padding: 9px;
+}
+.add-rule {
+  margin: 18px 25px 22px;
+}
+.segment-bottom {
+  border-top: 1px solid #eef1e6;
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  justify-content: space-between;
+}
+.segment-bottom > span {
+  display: flex;
+  gap: 8px;
+  font-size: 9px;
+  color: var(--metadata);
+  max-width: 390px;
+  line-height: 1.6;
+}
+.segment-bottom > span svg {
+  flex-shrink: 0;
+}
+.segment-bottom > div {
+  display: flex;
+  gap: 9px;
+}
+.segment-builder > :global(.notice) {
+  margin: 0 24px 22px;
+}
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 30px 0 16px;
+}
+.section-heading > span {
+  font-size: 10px;
+}
+.saved-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.saved-grid > :global(.card) {
+  padding: 21px;
+}
+.saved-icon {
+  display: grid;
+  place-items: center;
+  background: #f0f4e7;
+  border-radius: 7px;
+  color: var(--metadata);
+  width: 36px;
+  height: 36px;
+  margin-bottom: 17px;
+}
+.saved-grid h3 {
+  font-family: var(--serif);
+  font-size: 18px;
+  color: var(--metadata);
+}
+.saved-grid p {
+  font-size: 9px;
+  line-height: 1.8;
+  color: var(--metadata);
+  min-height: 47px;
+  margin-top: 8px;
+}
+.saved-count {
+  display: block;
+  font-size: 26px;
+  font-family: var(--serif);
+  font-weight: 400;
+  color: var(--metadata);
+  margin-top: 12px;
+}
+.saved-count small {
+  font-family: Arial, sans-serif;
+  font-size: 9px;
+  color: var(--metadata);
+}
+.saved-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 17px;
+  padding-top: 16px;
+  border-top: 1px solid #eef2e5;
+}
+.saved-actions :global(.icon-button) {
+  margin-left: auto;
+}
+.segment-builder + :global(.card) {
+  margin-top: 22px;
+}
+@media (max-width: 1200px) {
+  .saved-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .rule-row {
+    gap: 7px;
+  }
+  .rule-row select {
+    font-size: 9px;
+  }
+  .segment-bottom {
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 1000px) {
+  .rule-row {
+    flex-wrap: wrap;
+  }
+  .rule-index {
+    min-width: 25px;
+  }
+  .rule-row > select:first-of-type {
+    min-width: 150px;
+    flex: 2;
+  }
+  .rule-row input {
+    min-width: 80px;
+  }
+}
+@media (max-width: 760px) {
+  .saved-grid {
+    grid-template-columns: 1fr;
+  }
+  .preset-row {
+    gap: 8px;
+  }
+  .preset {
+    font-size: 9px;
+    padding: 10px;
+  }
+  .rule-row {
+    gap: 9px;
+  }
+  .rule-row > select:first-of-type {
+    flex: 1;
+    min-width: 120px;
+  }
+  .rule-row > select:nth-of-type(2) {
+    min-width: 100px;
+  }
+  .rule-row input {
+    flex: 1;
+    min-width: 120px;
+  }
+  .segment-bottom > div {
+    width: 100%;
+  }
+  .segment-bottom :global(.button) {
+    flex: 1;
+  }
+  .segment-name {
+    max-width: none;
+  }
+}
